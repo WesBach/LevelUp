@@ -9,9 +9,6 @@ enum StateType {
 	FOLLOWER
 };
 
-
-//green ,teal ,black
-
 enum ActionType {
 	PURSUE,
 	EVADE,
@@ -27,6 +24,7 @@ class iState {
 	virtual ~iState() {}
 	virtual void performAction(cGameObject* player, cGameObject* me, float deltaTime) = 0;
 	virtual StateType getStateType() = 0;
+	virtual void performEnemyAction(cGameObject* firstObject, cGameObject* secondObject, glm::vec3 enemyForward, float deltaTime) = 0;
 };
 
 #endif

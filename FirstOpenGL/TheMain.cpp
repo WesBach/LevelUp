@@ -53,15 +53,13 @@ bool loadTextures = false;
 int height = 480;	/* default */
 int width = 640;	// default
 
-void ResolveCollisions(std::vector<cGameObject*> theGameObjects);
-void CalculateReflection(cGameObject* theObject);
 bool LoadLightsAttributesFromFile(std::string& fileName, std::vector<cLight>& theLights);
 void renderPlayerInfo(int winWidth, int winHeight);
-glm::vec3 getTriangleCentroid(cPhysTriangle* theTriangle);
 void printError(const std::string& error);
 void createProjectiles();
 void updateProjectilePositions(double deltaTime);
 void checkForProjectileCollisions();
+void checkObjectBounds();
 
 std::string modelAndLightFile = "assets/GameInfoFiles/SceneInfo.txt";
 
@@ -71,19 +69,16 @@ cShaderManager*		g_pShaderManager;		// Heap, new (and delete)
 cLightManager*		g_pLightManager;
 DebugRenderer*		g_pTheDebugrender;
 CTextureManager*	g_pTextureManager;
-//std::vector<cGameObject*>  g_vecTerrain;
-//std::vector<cGameObject*>  g_vecEnemiesToDraw;
-//std::vector<cGameObject*> g_vecThePlayersToDraw;
 
 std::vector<cEnemy> g_vecEnemies;
-
 cPlayer* g_pThePlayer;
+sScene* g_pCurrentScene;
+
 cPathingManager* g_thePathingManager;
 cFBO* g_pFBO;
 cSceneManager* g_pSceneManager;
 cTextRenderer* g_ptheTextRenderer;
 XMLReader* g_pTheXMLReader;
-sScene* g_pCurrentScene;
 
 int g_languageNum = 6;
 //physics
@@ -108,7 +103,6 @@ double g_lastTimeStep = 0.0;
 //for the movement of the teapot
 CommandManager* theParallelCommands;
 CommandManager* theSerialCommands = new CommandManager(false);
-void checkObjectBounds();
 
 glm::vec3 maxDimensions(35.0f, 0.0f, 35.0f);
 glm::vec3 minDimensions(-35.0f, 0.0f, -35.0f);
@@ -138,8 +132,7 @@ int main(int argc, char** argv)
 
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 2);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
-	// C++ string
-	// C no strings. Sorry. char    char name[7] = "Michael\0";
+
 	g_pGLFWWindow = glfwCreateWindow(width, height,
 		title.c_str(),
 		NULL, NULL);
@@ -156,6 +149,7 @@ int main(int argc, char** argv)
 	gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
 	glfwSwapInterval(1);
 
+	//print versions
 	std::cout << glGetString(GL_VENDOR) << " "
 		<< glGetString(GL_RENDERER) << ", "
 		<< glGetString(GL_VERSION) << std::endl;
@@ -164,13 +158,11 @@ int main(int argc, char** argv)
 	::g_pShaderManager = new cShaderManager();
 	cShader vertShader;
 	cShader fragShader;
-
 	vertShader.fileName = "simpleVert.glsl";
 	fragShader.fileName = "simpleFrag.glsl";
 	::g_pShaderManager->setBasePath("assets//shaders//");
 
-	// Shader objects are passed by reference so that
-	//	we can look at the results if we wanted to. 
+	// Shader Manager
 	if (!::g_pShaderManager->createProgramFromFile(
 		"mySexyShader", vertShader, fragShader))
 	{
@@ -181,6 +173,7 @@ int main(int argc, char** argv)
 		//		exit(
 	}
 
+	//Scene manager
 	::g_pSceneManager = new cSceneManager();
 	::g_pVAOManager = new cVAOMeshManager();
 	sexyShaderID = ::g_pShaderManager->getIDFromFriendlyName("mySexyShader");
@@ -197,17 +190,20 @@ int main(int argc, char** argv)
 	//g_pSceneManager->LoadSceneFromFileIntoSceneMap(std::string("assets/GameInfoFiles/Scene2.txt"), 1);
 	//g_pSceneManager->LoadSceneFromFileIntoSceneMap(std::string("assets/GameInfoFiles/Scene3.txt"), 2);
 	//g_pSceneManager->LoadSceneFromFileIntoSceneMap(std::string("assets/GameInfoFiles/Scene4.txt"), 3);
-	//LoadSceneFromFileWithNormalAndUV(modelAndLightFile);
 
+	//populate scene appropriately
 	sScene tempScene = g_pSceneManager->getSceneById(0);
 	g_pCurrentScene = new sScene();
 	g_pSceneManager->copySceneFromCopyToPointer(tempScene, g_pCurrentScene);
 
+	//populate the player
 	g_pThePlayer = new cPlayer();
 	g_pThePlayer->thePlayerObject = g_pCurrentScene->players[0];
 	g_pThePlayer->currentHealth = 100;
 	g_pThePlayer->playerSpeed = 2.0f;
 	g_pThePlayer->rotationSpeed = 2.0f;
+	//populate the enemies
+	g_pSceneManager->populateEnemies(g_vecEnemies,g_pCurrentScene);
 
 	  /////////////////////
 	 //	Debug Renderer	//
@@ -356,6 +352,12 @@ int main(int argc, char** argv)
 		renderScene(::g_pCurrentScene->enemies, g_pGLFWWindow);
 		renderScene(::g_pCurrentScene->players, g_pGLFWWindow);
 
+		//Render the enemy projectiles
+		for (int i = 0; i < g_vecEnemies.size(); i++)
+		{
+			renderScene(g_vecEnemies[i].projectilesToDraw, g_pGLFWWindow);
+		}
+
 		if (g_pThePlayer->projectilesToDraw.size() > 0)
 		{
 			renderScene(::g_pThePlayer->projectilesToDraw, g_pGLFWWindow);
@@ -417,10 +419,9 @@ int main(int argc, char** argv)
 		//update projectile positions
 		updateProjectilePositions(deltaTime);
 
-		//TODO:: check for collisions between projectiles and enemies
-		if (g_pThePlayer->projectilesToDraw.size() > 0) {
-			checkForProjectileCollisions();
-		}
+		//TODO:: check for collisions between projectiles and enemies	
+		checkForProjectileCollisions();
+		
 
 		//draw the bounding boxes
 		::g_pTheDebugrender->RenderDebugObjects(v, p, deltaTime);
@@ -457,8 +458,11 @@ void printError(const std::string& error) {
 }
 
 void checkForProjectileCollisions() {
+
 	std::vector<bool> theObjectsForRemoval;
 	bool collided = false;
+
+	//check the players projectiles
 	for (int i = 0; i < g_pThePlayer->projectiles.size(); i++) {
 		for (int index = 0; index < g_pCurrentScene->enemies.size(); index++) {
 
@@ -473,18 +477,65 @@ void checkForProjectileCollisions() {
 				break;
 			}
 		}
-
 		theObjectsForRemoval.push_back(collided);
 		//reset collided
 		collided = false;
 	}
 
-	//do the object removal
+	//do the player projectile object removal
 	for (int i = 0; i < theObjectsForRemoval.size(); i++) {
 		//check to see if the object collided
 		if (theObjectsForRemoval[i] == true)
 		{
 			g_pThePlayer->removeProjectile(g_pThePlayer->projectilesToDraw[i]);
+		}
+	}
+
+	/////////////////////////////////
+	//check the enemies projectiles//
+	////////////////////////////////
+	//go through each enemy
+	std::vector<std::vector<bool>> theEnemyProjectilesToRemove;
+
+	for (int i = 0; i < g_vecEnemies.size(); i++) {
+		std::vector<bool> removals;
+		//go through each projectile for each enemy
+		for (int projectilIndex = 0; projectilIndex < g_vecEnemies[i].projectilesToDraw.size(); projectilIndex++) {
+
+			//if the projectile is within the range of the player get rid of it and do damage
+			if (glm::distance(g_vecEnemies[i].projectilesToDraw[projectilIndex]->position, g_pThePlayer->thePlayerObject->position) < g_pThePlayer->thePlayerObject->scale /2.f) {
+				//do damage to the player
+				g_pThePlayer->currentHealth -= g_vecEnemies[i].projectiles[projectilIndex].damage;
+				//flag this index to be removed
+				removals.push_back(true);
+			}
+			else {
+				//flag this index to not be removed
+				removals.push_back(false);
+			}
+
+			if (projectilIndex == g_vecEnemies[i].projectilesToDraw.size() - 1) {
+				//add the vector to the vector for later
+				theEnemyProjectilesToRemove.push_back(removals);
+			}
+		}
+
+		if (g_vecEnemies[i].projectiles.size() == 0) {
+			//add a dummy entry to keep the correct structure
+			theEnemyProjectilesToRemove.push_back(std::vector<bool>());
+		}
+	}
+
+	//remove the proper projectiles from the correct enemy vectors
+	//go through the first vector
+	for (int i = 0; i < theEnemyProjectilesToRemove.size(); i++) {
+		//go through the inner vectors
+		for (int index = 0; index < theEnemyProjectilesToRemove[i].size();index++) {
+			//if this index is true
+			if (theEnemyProjectilesToRemove[i][index] == true) {
+				//remove the projectile
+				g_vecEnemies[i].removeProjectile(g_vecEnemies[i].projectilesToDraw[index]);
+			}
 		}
 	}
 
@@ -530,7 +581,6 @@ std::wstring s2ws(std::string& s)
 	delete[] buf;
 	return r;
 }
-
 
 void checkObjectBounds() {
 	//check the players
@@ -607,8 +657,61 @@ void checkObjectBounds() {
 			g_pThePlayer->removeProjectile(g_pThePlayer->projectilesToDraw[i]);
 		}
 	}
-}
 
+	//////////////////////////////////
+	//CHECK FOR ENEMY PROJECTILES ////
+	/////////////////////////////////
+	std::vector<std::vector<bool>> theEnemyProjectilesToRemove;
+
+	for (int i = 0; i < g_vecEnemies.size(); i++) {
+		std::vector<bool> removals;
+		//go through each projectile for each enemy
+		for (int projectilIndex = 0; projectilIndex < g_vecEnemies[i].projectilesToDraw.size(); projectilIndex++) {
+
+			//if the projectile is within the range of the player or a wall get rid of it(do damage if its the player)
+			if (g_vecEnemies[i].projectilesToDraw[projectilIndex]->position.x > maxDimensions.x ||
+				g_vecEnemies[i].projectilesToDraw[projectilIndex]->position.x < minDimensions.x) {
+				//flag this index to be removed
+				removals.push_back(true);
+			}		
+			else if (g_vecEnemies[i].projectilesToDraw[projectilIndex]->position.z > maxDimensions.z ||
+				g_vecEnemies[i].projectilesToDraw[projectilIndex]->position.z < minDimensions.z) {
+				//flag this index to be removed
+				removals.push_back(true);
+			}
+			else {
+				//flag this index to not be removed
+				removals.push_back(false);
+			}
+
+			if (projectilIndex == g_vecEnemies[i].projectilesToDraw.size() - 1) {
+				//add the vector to the vector for later
+				theEnemyProjectilesToRemove.push_back(removals);
+			}
+		}
+
+		//make sure the objects are in the right order
+		if (g_vecEnemies[i].projectilesToDraw.size() <= 0)
+		{
+			theEnemyProjectilesToRemove.push_back(std::vector<bool>());
+		}
+	}
+
+	//remove the proper projectiles from the correct enemy vectors
+	//go through the first vector
+	for (int i = 0; i < theEnemyProjectilesToRemove.size(); i++) {
+		//go through the inner vectors
+		for (int index = 0; index < theEnemyProjectilesToRemove[i].size(); index++) {
+			//if this index is true
+			if (theEnemyProjectilesToRemove[i][index] == true) {
+				//remove the projectile
+				g_vecEnemies[i].removeProjectile(g_vecEnemies[i].projectilesToDraw[index]);
+			}
+		}
+	}
+
+
+}
 
 void createProjectiles() {
 
@@ -635,12 +738,24 @@ void createProjectiles() {
 
 void updateProjectilePositions(double deltaTime) {
 
-	//look through the current projectiles and update their positions
+	//Euler Integration
+
+	//look through the current player projectiles and update their positions
 	for (int i = 0; i < g_pThePlayer->projectiles.size(); i++) {
 		//move the projectile
 		float speed = g_pThePlayer->projectiles[i].speed;
 		glm::vec3 direction = g_pThePlayer->projectiles[i].direction;
 
 		g_pThePlayer->projectiles[i].object->position += (direction * speed) * (float)deltaTime;
+	}
+
+	//look through the enemy projectiles
+	for (int i = 0; i < g_vecEnemies.size(); i++) {
+		for (int index = 0; index < g_vecEnemies[i].projectiles.size(); index++) {
+			//update the projectile position
+			float speed = g_vecEnemies[i].projectiles[index].speed;
+			glm::vec3 direction = g_vecEnemies[i].projectiles[index].direction;
+			g_vecEnemies[i].projectiles[index].object->position += (direction * speed) * (float)deltaTime;
+		}
 	}
 }

@@ -3,8 +3,10 @@
 #include <glm\glm.hpp>
 #include "cMathHelper.h"
 #include "cPlayer.h"
+#include "cEnemy.h"
 
 extern cPlayer* g_pThePlayer;
+extern std::vector<cEnemy> g_vecEnemies;
 
 cCuriousState::cCuriousState() {
 	this->mAction = ActionType::IDLE;	
@@ -90,29 +92,13 @@ void cCuriousState::performAction(cGameObject* player, cGameObject* me,float del
 			direction = glm::normalize(direction);
 			direction.y = 0.0f;
 
+			performEnemyAction(player, me, direction, deltaTime);
+			
 			//make the enemy move towards the player at a set speed 
 			me->position += direction * this->speed * deltaTime;
 		}
 
 		me->orientation2.y += (rotationSpeed * rotAngle);
-
-		//TODO:: make an enemy class for the speed and timeinradius 
-		//do the damage
-		if (glm::distance(me->position, player->position) < 2.0f) {
-			this->timeInRadius += deltaTime;
-			//make sure the enemy is within the radius for a second before doing any damage
-			if (timeInRadius >= 1.0f) {
-				if (g_pThePlayer->currentHealth > 0) {
-					g_pThePlayer->currentHealth -= 1.f;
-					//reset the counter
-					this->timeInRadius = 0.f;
-				}
-			}
-		}
-		else {
-			//if the player moves outside of the radius reset the timer
-			this->timeInRadius = 0.0f;
-		}
 	}
 	else if (this->mAction == ActionType::EVADE) {
 		//turn away from the person and run
@@ -152,6 +138,7 @@ void cCuriousState::performAction(cGameObject* player, cGameObject* me,float del
 			direction = glm::normalize(direction);
 			direction.y = 0.0f;
 
+			performEnemyAction(player,me, direction,deltaTime);
 			//make the enemy move towards the player at a set speed 
 			me->position += -direction * this->speed * deltaTime;
 		}
@@ -172,6 +159,25 @@ void cCuriousState::performAction(cGameObject* player, cGameObject* me,float del
 			else {
 				this->mAction = ActionType::EVADE;
 			}
+		}
+	}
+}
+
+void  cCuriousState::performEnemyAction(cGameObject* firstObject, cGameObject* secondObject, glm::vec3 enemyForward,float deltaTime) {
+	cEnemy* currentEnemy = NULL;
+	//if the player is involved perform an action
+	if (firstObject == g_pThePlayer->thePlayerObject)
+	{
+		for (int i = 0; i < g_vecEnemies.size(); i++) {
+			//get the right enemy
+			if (secondObject == g_vecEnemies[i].theEnemyObject) {
+				currentEnemy = &g_vecEnemies[i];
+			}
+		}
+		//make sure we found an enemy
+		if (currentEnemy != NULL) {
+			//make the enemy attack
+			currentEnemy->attack(enemyForward,deltaTime);
 		}
 	}
 }

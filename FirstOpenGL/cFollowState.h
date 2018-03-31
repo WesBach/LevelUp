@@ -11,6 +11,7 @@ public:
 	float speed;
 
 private:
+	void performEnemyAction(cGameObject* firstObject, cGameObject* secondObject, glm::vec3 enemyForward, float deltaTime);
 	float visionDistance;
 	float chaseThreshold;
 	StateType mState;

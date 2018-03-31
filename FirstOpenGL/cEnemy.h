@@ -15,18 +15,25 @@ enum eAttackType {
 
 class cEnemy {
 public:
+	cEnemy();
+	~cEnemy();
 	//for attacking
 	eEnemyType enemyType;
 	eAttackType attackType;
 	glm::vec3 direction;
+	float projectileRange;
+	float health;
 
 	cGameObject* theEnemyObject;
 
 	std::vector<cGameObject*> projectilesToDraw;
-	std::vector<sProjectile> projectilePool;
+	std::vector<sProjectile> projectilePool;	
+	std::vector<sProjectile> projectiles;
+	float timeElapsedBetweenProjectiles;
 
-	void attack(double deltaTime);
+	void attack(glm::vec3 direction,float deltaTime);
 	void removeProjectile(cGameObject* theProjectile);
+	sProjectile createProjectileBasedOnEnemyStats();
 	int getNextProjectileIndex();
 };
 

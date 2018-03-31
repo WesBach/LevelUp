@@ -3,8 +3,10 @@
 #include <glm\glm.hpp>
 #include "cMathHelper.h"
 #include "cPlayer.h"
+#include "cEnemy.h"
 
 extern cPlayer* g_pThePlayer;
+extern std::vector<cEnemy> g_vecEnemies;
 
 cAngryState::cAngryState() {
 	this->mAction = ActionType::IDLE;
@@ -93,6 +95,9 @@ void cAngryState::performAction(cGameObject* player, cGameObject* me, float delt
 			direction = glm::normalize(direction);
 			direction.y = 0.0f;
 
+			//the enemy is in range
+			performEnemyAction(player, me, direction,deltaTime);
+
 			//make the enemy move away from the player at a set speed 
 			me->position += -direction * this->speed * deltaTime;
 		}
@@ -112,7 +117,6 @@ void cAngryState::performAction(cGameObject* player, cGameObject* me, float delt
 
 		glm::vec3 unitForVec = GetUnitVector(forwardVector, forwardMag);
 		glm::vec3 unitDifVec = GetUnitVector(difVector, difMag);
-
 		glm::vec3 axisRotation = glm::cross(unitForVec, unitDifVec);
 
 		float rotAngle = 0.f;
@@ -136,18 +140,22 @@ void cAngryState::performAction(cGameObject* player, cGameObject* me, float delt
 			direction = glm::normalize(direction);
 			direction.y = 0.0f;
 
+			//the enemy is in range
+			performEnemyAction(player, me, forwardVector,deltaTime);
+
 			//make the enemy move towards the player at a set speed 
 			me->position += direction * this->speed * deltaTime;
 		}
 
 		me->orientation2.y += (rotationSpeed * rotAngle);
 
-		//TODO:: make an enemy class for the speed and timeinradius 
 		//do the damage
 		if (glm::distance(me->position, player->position) < 2.0f ) {
 			this->timeInRadius += deltaTime;
 			//make sure the enemy is within the radius for a second before doing any damage
 			me->diffuseColour = stateWhite;
+
+			//TODO:: remove this
 			if (timeInRadius >= 1.0f) {
 				if (g_pThePlayer->currentHealth > 0) {
 					g_pThePlayer->currentHealth -= 1.f;
@@ -180,6 +188,26 @@ void cAngryState::performAction(cGameObject* player, cGameObject* me, float delt
 		}
 	}
 }
+
+void cAngryState::performEnemyAction(cGameObject* firstObject, cGameObject* secondObject,glm::vec3 enemyForward, float deltaTime) {
+	cEnemy* currentEnemy = NULL;
+	//if the player is involved perform an action
+	if (firstObject == g_pThePlayer->thePlayerObject)
+	{
+		for (int i = 0; i < g_vecEnemies.size(); i++) {
+			//get the right enemy
+			if (secondObject == g_vecEnemies[i].theEnemyObject) {
+				currentEnemy = &g_vecEnemies[i];
+			}
+		}
+		//make sure we found an enemy
+		if (currentEnemy != NULL) {
+			//make the enemy attack
+			currentEnemy->attack(enemyForward,deltaTime);
+		}
+	}
+}
+
 
 StateType cAngryState::getStateType() {
 	return this->mState;

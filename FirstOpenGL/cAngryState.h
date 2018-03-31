@@ -10,6 +10,9 @@ public:
 	virtual StateType getStateType();
 	float speed;
 private:
+
+	virtual void performEnemyAction(cGameObject* firstObject,cGameObject* secondObject, glm::vec3 enemyForward, float deltaTime);
+
 	float visionDistance;
 	float chaseThreshold;
 	StateType mState;
@@ -18,7 +21,6 @@ private:
 
 	//timer for damage 
 	float timeInRadius;
-
 };
 
 #endif // !_cState_HG_

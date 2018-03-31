@@ -43,4 +43,9 @@ int TestAABBAABB(AABB_Center_Radius* a, AABB_Center_Radius* b);
 int TestAABBPlane(AABB_Center_Radius b, Plane p);
 
 int testPointAABB(glm::vec3 point, AABB_Center_Radius* b);
+
+void CalculateReflection(cGameObject* theObject);
+
+void ResolveCollisions(std::vector<cGameObject*> theGameObjects);
+
 #endif

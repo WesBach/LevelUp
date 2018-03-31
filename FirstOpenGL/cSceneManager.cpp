@@ -44,12 +44,6 @@ bool  cSceneManager::LoadSceneFromFileIntoSceneMap(std::string& fileName, int ma
 	float playerSpeed;
 	sceneInfo >> playerSpeed;
 
-	//TODO:: set the player when the scenes are loaded
-	//tempScene.pl = new cPlayer();
-	//g_pThePlayer->thePlayerObject = g_vecThePlayers[0];
-	//g_pThePlayer->playerSpeed = playerSpeed;
-	//g_pThePlayer->rotationSpeed = playerSpeed;
-
 	//populate the terrain
 	ReadFileToToken(sceneInfo, "NUMBER_OF_TERRAIN");
 	sceneInfo >> numTerrain;
@@ -421,10 +415,12 @@ void cSceneManager::populateEnemies(std::vector<cEnemy>& enemies, sScene* theSce
 		if (stateType == StateType::FOLLOWER) {
 			attackType = eAttackType::EXPLOSION;
 			enemy.enemyType = eEnemyType::SUICIDE;
+			enemy.health = 100.f;
 		}
 		else {
 			enemy.enemyType = eEnemyType::GUNNER;
 			attackType = eAttackType::PROJECTILE;
+			enemy.health = 150.f;
 		}
 
 		//set the attack type

@@ -31,8 +31,6 @@ glm::vec3 getTriangleCentroid(glm::vec3* theTriangle[3]);
 
 void getXYFromRadiusAndAngle(float& x, float&y, float radius, float angle);
 
-void populateTextures();
-
 void InitPhysics();
 
 namespace QnDTexureSamplerUtility

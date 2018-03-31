@@ -4,8 +4,10 @@
 #include <glm\glm.hpp>
 #include "cMathHelper.h"
 #include "cPlayer.h"
+#include "cEnemy.h"
 
 extern cPlayer* g_pThePlayer;
+extern std::vector<cEnemy> g_vecEnemies;
 
 cFollowState::cFollowState() {
 	this->mAction = ActionType::IDLE;
@@ -89,8 +91,13 @@ void cFollowState::performAction(cGameObject* player, cGameObject* me, float del
 			direction = glm::normalize(direction);
 			direction.y = 0.0f;
 
-			//make the enemy move towards the player at a set speed 
-			me->position += -direction * this->speed * deltaTime;
+			if (glm::distance(player->position,me->position) <= 2.0f) {
+				performEnemyAction(player, me, forwardVector,deltaTime);
+			}
+			else {
+				//make the enemy move towards the player at a set speed 
+				me->position += -direction * this->speed * deltaTime;
+			}
 		}
 
 		me->orientation2.y += (rotationSpeed * rotAngle);
@@ -104,10 +111,8 @@ void cFollowState::performAction(cGameObject* player, cGameObject* me, float del
 
 		float forwardMag = GetMag(forwardVector);
 		float difMag = GetMag(difVector);
-
 		glm::vec3 unitForVec = GetUnitVector(forwardVector, forwardMag);
 		glm::vec3 unitDifVec = GetUnitVector(difVector, difMag);
-
 		glm::vec3 axisRotation = glm::cross(unitForVec, unitDifVec);
 
 		float rotAngle = 0.f;
@@ -130,11 +135,8 @@ void cFollowState::performAction(cGameObject* player, cGameObject* me, float del
 			glm::vec3 direction = player->position - me->position;
 			direction = glm::normalize(direction);
 			direction.y = 0.0f;
-
 			//make the enemy move towards the player at a set speed 
-
-			me->position += direction * this->speed * deltaTime;
-			
+			me->position += direction * this->speed * deltaTime;			
 		}
 
 		//set the players orientation
@@ -144,19 +146,8 @@ void cFollowState::performAction(cGameObject* player, cGameObject* me, float del
 		if (g_pThePlayer->thePlayerObject == player) {
 			//make sure its within the radius
 			if (glm::distance(me->position, player->position) < 2.0f) {
-				this->timeInRadius += deltaTime;
 				//make sure the enemy is within the radius for a second before doing any damage
-				if (timeInRadius >= 1.0f) {
-					if (g_pThePlayer->currentHealth > 0) {
-						g_pThePlayer->currentHealth -= 1.f;
-						//reset the counter
-						this->timeInRadius = 0.f;
-					}
-				}
-			}
-			else {
-				//if the player moves outside of the radius reset the timer
-				this->timeInRadius = 0.0f;
+				performEnemyAction(player, me,forwardVector,deltaTime);
 			}
 		}
 	}
@@ -174,6 +165,27 @@ void cFollowState::performAction(cGameObject* player, cGameObject* me, float del
 				this->mAction = ActionType::EVADE;
 			}
 
+		}
+	}
+}
+
+void cFollowState::performEnemyAction(cGameObject* firstObject, cGameObject* secondObject, glm::vec3 enemyForward, float deltaTime) {
+	cEnemy* currentEnemy = NULL;
+	//if the player is involved perform an action
+	if (firstObject == g_pThePlayer->thePlayerObject)
+	{
+		for (int i = 0; i < g_vecEnemies.size(); i++) {
+			//get the right enemy
+			if (secondObject == g_vecEnemies[i].theEnemyObject) {
+				currentEnemy = &g_vecEnemies[i];
+			}
+		}
+		//make sure we found an enemy
+		if (currentEnemy != NULL) {
+			//make the enemy attack
+			glm::vec3 direction = secondObject->position - firstObject->position;
+			direction = glm::normalize(direction);
+			currentEnemy->attack(direction,deltaTime);
 		}
 	}
 }

@@ -8,9 +8,12 @@ public:
 	cCuriousState();
 	virtual void performAction(cGameObject* player, cGameObject* me, float deltaTime);
 	virtual StateType getStateType();
+	;
+
 	float speed;
 
 private:
+	virtual void  cCuriousState::performEnemyAction(cGameObject* firstObject, cGameObject* secondObject, glm::vec3 enemyForward, float deltaTime);
 	float visionDistance;
 	float chaseThreshold;
 	StateType mState;
