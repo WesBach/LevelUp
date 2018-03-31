@@ -1,0 +1,10 @@
+//BMPs
+NUM_TEXTURES
+5
+
+TEXTURE_NAMES
+leaves.bmp
+rust.bmp
+TropicalSunnyDayBack2048.bmp
+lava.bmp
+gravel.bmp

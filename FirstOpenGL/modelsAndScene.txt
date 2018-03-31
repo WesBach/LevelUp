@@ -1,0 +1,93 @@
+NUM_MODELS_UV
+5
+
+MODEL_NAME_UV_START
+Sphere_xyz_n_uv.ply
+triangle.ply
+SmoothSphere_Inverted_Normals_xyz_n.ply
+Utah_Teapot_xyz_n_uv.ply
+MeshLabTerrain_FLAT_xyz_n_uv.ply
+
+
+
+CAMERA_POSITION
+0.0 100.0 20.0
+
+NUMBER_OF_PLAYERS
+1
+
+//meshname											pos.x		pos.y		pos.z		scale  vel.x	vel.y	vel.z   radius	Mass  diff.x	diff.y  diff.z diff.a    iswireframe	postRot.x	postRot.y	postRot.z  typeOfObject	hassAABB	hasTexture	stateType
+PLAYERS
+Sphere_xyz_n_uv.ply									20.0	 	0.0			00.0		2.0		0.0	 	0.0		0.0		 1.5	13.0	1.0		0.0		1.0		1.0			0			0.0			0.0			0.0			SPHERE		1				0		NONE
+
+
+PLAYER_SPEED
+1.0
+
+NUMBER_OF_TERRAIN
+1
+
+//meshname											pos.x		pos.y		pos.z		scale  vel.x	vel.y	vel.z   radius	Mass  diff.x	diff.y  diff.z diff.a    iswireframe	postRot.x	postRot.y	postRot.z  typeOfObject	hassAABB	hasTexture	stateType
+TERRAIN
+SmoothSphere_Inverted_Normals_xyz_n.ply				0.0			0.0			0.0			2000.0	0.0		0.0		0.0		 1.0	1.0		0.0		1.0		1.0		1.0			0			0.0			0.0			0.0			PLANE		0				0		NONE
+MeshLabTerrain_FLAT_xyz_n_uv.ply					0.0	 		-2.0		0.0			0.006	0.0	 	0.0		0.0		 0.0	1.0		1.0		1.0		1.0		1.0			0			-90.0		0.0			0.0			PLANE		0				0		NONE
+
+
+NUMBER_OF_ENEMIES
+1
+
+//meshname											pos.x		pos.y		pos.z		scale  vel.x	vel.y	vel.z   radius	Mass  diff.x	diff.y  diff.z diff.a    iswireframe	postRot.x	postRot.y	postRot.z  typeOfObject	hassAABB	hasTexture	stateType
+ENEMIES	
+Utah_Teapot_xyz_n_uv.ply							0.0	 		0.0			00.0		0.05	0.0	 	0.0		0.0		 1.5	13.0	1.0		0.0		1.0		1.0			0			-90.0		0.0			0.0			SPHERE		0				0		CURIOUS
+
+
+
+
+Sphere_xyz_n_uv.ply									05.0	 	00.0		00.0		2.0		0.0	 	0.0		0.0		 1.0	12.0	1.0		1.0		1.0		1.0			0			0.0			0.0			0.0				0		SPHERE		1				0		
+Sphere_xyz_n_uv.ply									10.0	 	00.0		00.0		2.0		0.0	 	0.0		0.0		 0.5	11.0	1.0		1.0		1.0		1.0			0			0.0			0.0			0.0				0		SPHERE		1				0		
+Sphere_xyz_n_uv.ply									15.0	 	00.0		00.0		2.0		0.0	 	0.0		0.0		 2.0	14.0	1.0		1.0		1.0		1.0			0			0.0			0.0			0.0				0		SPHERE		1				0		
+Sphere_xyz_n_uv.ply									20.0	 	00.0		00.0		2.0		0.0	 	0.0		0.0		 3.0	16.0	1.0		1.0		1.0		1.0			0			0.0			0.0			0.0				0		SPHERE		1				0		
+Sphere_xyz_n_uv.ply									25.0	 	00.0		00.0		2.0		0.0	 	0.0		0.0		 2.5	15.0	1.0		1.0		1.0		1.0			0			0.0			0.0			0.0				0		SPHERE		1				0		
+Sphere_xyz_n_uv.ply									30.0	 	00.0		00.0		2.0		0.0	 	0.0		0.0		 0.25	10.5	1.0		1.0		1.0		1.0			0			0.0			0.0			0.0				0		SPHERE		1				0		
+Sphere_xyz_n_uv.ply									35.0	 	00.0		00.0		2.0		0.0	 	0.0		0.0		 3.5	17.0	1.0		1.0		1.0		1.0			0			0.0			0.0			0.0				0		SPHERE		1				0		
+Sphere_xyz_n_uv.ply									00.0	 	00.0		-5.0		2.0		0.0	 	0.0		0.0		 2.25	14.5	1.0		1.0		1.0		1.0			0			0.0			0.0			0.0				0		SPHERE		1				0		
+Sphere_xyz_n_uv.ply									05.0	 	00.0		-5.0		2.0		0.0	 	0.0		0.0		 1.75	12.5	1.0		1.0		1.0		1.0			0			0.0			0.0			0.0				0		SPHERE		1				0		
+Sphere_xyz_n_uv.ply									10.0	 	00.0		-5.0		2.0		0.0	 	0.0		0.0		 1.5	13.0	1.0		0.0		1.0		1.0			0			0.0			0.0			0.0				0		SPHERE		1				0		
+Sphere_xyz_n_uv.ply									15.0	 	00.0		-5.0		2.0		0.0	 	0.0		0.0		 1.0	12.0	1.0		1.0		1.0		1.0			0			0.0			0.0			0.0				0		SPHERE		1				0		
+Sphere_xyz_n_uv.ply									20.0	 	00.0		-5.0		2.0		0.0	 	0.0		0.0		 0.5	11.0	1.0		1.0		1.0		1.0			0			0.0			0.0			0.0				0		SPHERE		1				0		
+Sphere_xyz_n_uv.ply									25.0	 	00.0		-5.0		2.0		0.0	 	0.0		0.0		 2.0	14.0	1.0		1.0		1.0		1.0			0			0.0			0.0			0.0				0		SPHERE		1				0		
+Sphere_xyz_n_uv.ply									30.0	 	00.0		-5.0		2.0		0.0	 	0.0		0.0		 3.0	16.0	1.0		1.0		1.0		1.0			0			0.0			0.0			0.0				0		SPHERE		1				0		
+Sphere_xyz_n_uv.ply									35.0	 	00.0		-5.0		2.0		0.0	 	0.0		0.0		 2.5	15.0	1.0		1.0		1.0		1.0			0			0.0			0.0			0.0				0		SPHERE		1				0		
+Sphere_xyz_n_uv.ply									00.0	 	00.0		-10.0		2.0		0.0	 	0.0		0.0		 0.25	10.5	1.0		1.0		1.0		1.0			0			0.0			0.0			0.0				0		SPHERE		1				0		
+Sphere_xyz_n_uv.ply									05.0	 	00.0		-10.0		2.0		0.0	 	0.0		0.0		 3.5	17.0	1.0		1.0		1.0		1.0			0			0.0			0.0			0.0				0		SPHERE		1				0		
+Sphere_xyz_n_uv.ply									10.0	 	00.0		-10.0		2.0		0.0	 	0.0		0.0		 2.25	14.5	1.0		1.0		1.0		1.0			0			0.0			0.0			0.0				0		SPHERE		1				0		
+Sphere_xyz_n_uv.ply									15.0	 	00.0		-10.0		2.0		0.0	 	0.0		0.0		 1.75	12.5	1.0		1.0		1.0		1.0			0			0.0			0.0			0.0				0		SPHERE		1				0		
+Sphere_xyz_n_uv.ply									20.0	 	00.0		-10.0		2.0		0.0	 	0.0		0.0		 1.5	13.0	1.0		0.0		1.0		1.0			0			0.0			0.0			0.0				0		SPHERE		1				0		
+Sphere_xyz_n_uv.ply									25.0	 	00.0		-10.0		2.0		0.0	 	0.0		0.0		 1.0	12.0	1.0		1.0		1.0		1.0			0			0.0			0.0			0.0				0		SPHERE		1				0		
+Sphere_xyz_n_uv.ply									30.0	 	00.0		-10.0		2.0		0.0	 	0.0		0.0		 0.5	11.0	1.0		1.0		1.0		1.0			0			0.0			0.0			0.0				0		SPHERE		1				0		
+Sphere_xyz_n_uv.ply									35.0	 	00.0		-10.0		2.0		0.0	 	0.0		0.0		 2.0	14.0	1.0		1.0		1.0		1.0			0			0.0			0.0			0.0				0		SPHERE		1				0		
+Sphere_xyz_n_uv.ply									00.0	 	00.0		-15.0		2.0		0.0	 	0.0		0.0		 1.5	13.0	1.0		0.0		1.0		1.0			0			0.0			0.0			0.0				0		SPHERE		1				0		
+Sphere_xyz_n_uv.ply									05.0	 	00.0		-15.0		2.0		0.0	 	0.0		0.0		 1.0	12.0	1.0		1.0		1.0		1.0			0			0.0			0.0			0.0				0		SPHERE		1				0		
+Sphere_xyz_n_uv.ply									10.0	 	00.0		-15.0		2.0		0.0	 	0.0		0.0		 0.5	11.0	1.0		1.0		1.0		1.0			0			0.0			0.0			0.0				0		SPHERE		1				0		
+Sphere_xyz_n_uv.ply									15.0	 	00.0		-15.0		2.0		0.0	 	0.0		0.0		 2.0	14.0	1.0		1.0		1.0		1.0			0			0.0			0.0			0.0				0		SPHERE		1				0		
+Sphere_xyz_n_uv.ply									20.0	 	00.0		-15.0		2.0		0.0	 	0.0		0.0		 3.0	16.0	1.0		1.0		1.0		1.0			0			0.0			0.0			0.0				0		SPHERE		1				0		
+Sphere_xyz_n_uv.ply									25.0	 	00.0		-15.0		2.0		0.0	 	0.0		0.0		 2.5	15.0	1.0		1.0		1.0		1.0			0			0.0			0.0			0.0				0		SPHERE		1				0		
+Sphere_xyz_n_uv.ply									30.0	 	00.0		-15.0		2.0		0.0	 	0.0		0.0		 0.25	10.5	1.0		1.0		1.0		1.0			0			0.0			0.0			0.0				0		SPHERE		1				0		
+Sphere_xyz_n_uv.ply									35.0	 	00.0		-15.0		2.0		0.0	 	0.0		0.0		 3.5	17.0	1.0		1.0		1.0		1.0			0			0.0			0.0			0.0				0		SPHERE		1				0		
+Sphere_xyz_n_uv.ply									00.0	 	00.0		-20.0		2.0		0.0	 	0.0		0.0		 2.25	14.5	1.0		1.0		1.0		1.0			0			0.0			0.0			0.0				0		SPHERE		1				0		
+Sphere_xyz_n_uv.ply									05.0	 	00.0		-20.0		2.0		0.0	 	0.0		0.0		 1.75	12.5	1.0		1.0		1.0		1.0			0			0.0			0.0			0.0				0		SPHERE		1				0		
+Sphere_xyz_n_uv.ply									10.0	 	00.0		-20.0		2.0		0.0	 	0.0		0.0		 1.5	13.0	1.0		0.0		1.0		1.0			0			0.0			0.0			0.0				0		SPHERE		1				0		
+Sphere_xyz_n_uv.ply									15.0	 	00.0		-20.0		2.0		0.0	 	0.0		0.0		 1.0	12.0	1.0		1.0		1.0		1.0			0			0.0			0.0			0.0				0		SPHERE		1				0		
+Sphere_xyz_n_uv.ply									20.0	 	00.0		-20.0		2.0		0.0	 	0.0		0.0		 0.5	11.0	1.0		1.0		1.0		1.0			0			0.0			0.0			0.0				0		SPHERE		1				0		
+Sphere_xyz_n_uv.ply									25.0	 	00.0		-20.0		2.0		0.0	 	0.0		0.0		 2.0	14.0	1.0		1.0		1.0		1.0			0			0.0			0.0			0.0				0		SPHERE		1				0		
+Sphere_xyz_n_uv.ply									30.0	 	00.0		-20.0		2.0		0.0	 	0.0		0.0		 3.0	16.0	1.0		1.0		1.0		1.0			0			0.0			0.0			0.0				0		SPHERE		1				0		
+Sphere_xyz_n_uv.ply									35.0	 	00.0		-20.0		2.0		0.0	 	0.0		0.0		 2.5	15.0	1.0		1.0		1.0		1.0			0			0.0			0.0			0.0				0		SPHERE		1				0		
+Sphere_xyz_n_uv.ply									00.0	 	00.0		-25.0		2.0		0.0	 	0.0		0.0		 0.25	10.5	1.0		1.0		1.0		1.0			0			0.0			0.0			0.0				0		SPHERE		1				0		
+Sphere_xyz_n_uv.ply									05.0	 	00.0		-25.0		2.0		0.0	 	0.0		0.0		 3.5	17.0	1.0		1.0		1.0		1.0			0			0.0			0.0			0.0				0		SPHERE		1				0		
+Sphere_xyz_n_uv.ply									10.0	 	00.0		-25.0		2.0		0.0	 	0.0		0.0		 2.25	14.5	1.0		1.0		1.0		1.0			0			0.0			0.0			0.0				0		SPHERE		1				0		
+Sphere_xyz_n_uv.ply									15.0	 	00.0		-25.0		2.0		0.0	 	0.0		0.0		 1.75	12.5	1.0		1.0		1.0		1.0			0			0.0			0.0			0.0				0		SPHERE		1				0		
+Sphere_xyz_n_uv.ply									20.0	 	00.0		-25.0		2.0		0.0	 	0.0		0.0		 1.5	13.0	1.0		0.0		1.0		1.0			0			0.0			0.0			0.0				0		SPHERE		1				0		
+Sphere_xyz_n_uv.ply									25.0	 	00.0		-25.0		2.0		0.0	 	0.0		0.0		 1.0	12.0	1.0		1.0		1.0		1.0			0			0.0			0.0			0.0				0		SPHERE		1				0		
+Sphere_xyz_n_uv.ply									30.0	 	00.0		-25.0		2.0		0.0	 	0.0		0.0		 0.5	11.0	1.0		1.0		1.0		1.0			0			0.0			0.0			0.0				0		SPHERE		1				0		
+Sphere_xyz_n_uv.ply									35.0	 	00.0		-25.0		2.0		0.0	 	0.0		0.0		 2.0	14.0	1.0		1.0		1.0		1.0			0			0.0			0.0			0.0				0		SPHERE		1				0		
+			
