@@ -4,6 +4,8 @@
 # Compiled Object files
 *.slo
 *.lo
+*.log
+*.tlog
 *.o
 *.obj
 
@@ -32,3 +34,8 @@
 *.exe
 *.out
 *.app
+
+
+.vs
+*.ipch
+*.enc
