@@ -4,21 +4,28 @@
 #include <vector>
 #include "sProjectile.h"
 class cGameObject;
+class cEmitter;
 
 class cPlayer {
 public:
 	cPlayer();
 	~cPlayer();
 	cGameObject* thePlayerObject;
+
+	bool isInExplosionRadius;
 	unsigned int currentHealth;
 	unsigned int maxHealth;
+
+	float timeInExplosion;
 	float playerSpeed;
 	float rotationSpeed;
+	float projectileRange;
+
 	void movePlayer(glm::vec3 amountToMove);
 	void rotatePlayer(glm::vec3 rotationDirection);
-
 	void removeProjectile(cGameObject* theProjectile);
 	void setProjectileInUse(sProjectile& projectile);
+	void setProjectileRange();
 
 	int getNextProjectileIndex();
 	//for shooting

@@ -31,6 +31,8 @@ void cEnemy::attack(glm::vec3 direction,float deltaTime) {
 				projectile.direction = direction;
 				projectile.object->position = this->theEnemyObject->position + projectile.direction;
 				projectile.damage = 10.f;
+				projectile.object->diffuseColour = glm::vec4(1.0f, 0.0f, 0.0f, 1.0f);
+
 				//push back the projectile
 				this->projectilesToDraw.push_back(projectile.object);
 				this->projectiles.push_back(projectile);
@@ -40,8 +42,39 @@ void cEnemy::attack(glm::vec3 direction,float deltaTime) {
 		}
 	}
 	else if (this->attackType == eAttackType::EXPLOSION) {
-		//TODO:: explosion effect
 		//probably just a sphere getting bigger where the enemy was
+		this->timeElapsedBetweenProjectiles += deltaTime;
+		//get the projectile
+		sProjectile projectile = this->createProjectileBasedOnEnemyStats();
+		//default check 
+		if (projectile.object != NULL) {
+			//make sure the object only explodes once 
+			if (isExploding == false){
+
+				//set the position for the explosion
+				projectile.object->position = this->theEnemyObject->position;
+				projectile.object->diffuseColour = glm::vec4(1.0f, 0.0f, 0.0f, 0.5f);
+				//make sure the explosion doesn't move
+				projectile.object->scale = 3.f;
+				projectile.speed = 0.0f;
+				projectile.direction = glm::vec3(0.f);
+				projectile.object->bIsWireFrame = false;
+				//set the damage for the explosion
+				projectile.damage = 40.f;
+				//push back the projectile
+				this->explosion.push_back(projectile.object);
+				this->projectiles.push_back(projectile);
+				this->isExploding = true;
+			}
+			else {
+				if (this->explosion.size() != 0) {
+					if (this->explosion[0]->scale < this->explosionSize) {
+						//increase the scale of the explosion and dont move it
+						this->explosion[0]->scale += deltaTime;
+					}
+				}
+			}
+		}
 	}
 
 }
@@ -50,6 +83,9 @@ cEnemy::cEnemy() {
 	this->direction = glm::vec3(0.f);
 	this->projectileRange = 10.f;
 	this->timeElapsedBetweenProjectiles = 0.5f;
+	this->explosionSize = 10.f;
+	this->isExploding = false;
+	this->particleManagerEmitterIndex = -1;
 
 	for (int i = 0; i < 10; i++) {
 		cGameObject* projectileObject = new cGameObject();
@@ -71,6 +107,7 @@ cEnemy::cEnemy() {
 
 cEnemy::~cEnemy() {
 	//delete this->theEnemyObject;
+	//delete this->theParticleEmitter;
 }
 
 void cEnemy::removeProjectile(cGameObject* theProjectile) {
@@ -99,6 +136,31 @@ void cEnemy::removeProjectile(cGameObject* theProjectile) {
 	}
 }
 
+void cEnemy::removeExplosion(cGameObject* theExplosion) {
+
+	for (std::vector<cGameObject*>::iterator it = this->explosion.begin(); it != this->explosion.end(); it++) {
+		//remove the projectile from the drawing vector
+		if (*it == theExplosion) {
+			it = this->explosion.erase(it);
+			break;
+		}
+	}
+
+	for (std::vector<sProjectile>::iterator it = this->projectiles.begin(); it != this->projectiles.end(); it++) {
+		if ((*it).object == theExplosion) {
+			it = this->projectiles.erase(it);
+			break;
+		}
+	}
+
+	for (int i = 0; i < this->projectilePool.size(); i++)
+	{
+		if (this->projectilePool[i].object == theExplosion)
+		{
+			this->projectilePool[i].inUse = false;
+		}
+	}
+}
 
 int cEnemy::getNextProjectileIndex() {
 	int index = -1;

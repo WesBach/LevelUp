@@ -91,7 +91,7 @@ int cEmitter::getLivingParticles(std::vector< cParticle* > &vecParticles)
 
 	// 1 more than the number of alive particles
 	// HACK: o-rama!
-	indexAliveParticles -= 50;
+	//indexAliveParticles -= 50;
 	if (indexAliveParticles < 0) indexAliveParticles = 0;
 	//
 	return indexAliveParticles;

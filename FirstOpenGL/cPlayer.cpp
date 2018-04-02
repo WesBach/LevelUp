@@ -1,5 +1,6 @@
 #include "cPlayer.h"
 #include "cGameObject.h"
+#include "cEmitter.h"
 
 cPlayer::cPlayer() {
 	this->thePlayerObject = new cGameObject();
@@ -8,7 +9,9 @@ cPlayer::cPlayer() {
 	this->forwardVector = glm::vec3(1.0f, 0.0f, 0.0f);
 	this->maxHealth = 100.0f;
 	this->currentHealth = 100.0f;
-
+	this->isInExplosionRadius = false;
+	this->projectileRange = 10.f;
+	this->timeInExplosion = 1.0f;
 	//for shooting
 	glm::vec3 forwardVector;
 
@@ -79,5 +82,12 @@ void cPlayer::removeProjectile(cGameObject* theProjectile) {
 		{
 			this->projectilePool[i].inUse = false;
 		}
+	}
+}
+
+void  cPlayer::setProjectileRange() {
+	//set the projectile range
+	for (int i = 0; i < this->projectilePool.size(); i++) {
+		this->projectilePool[i].projectileRange = this->projectileRange;
 	}
 }

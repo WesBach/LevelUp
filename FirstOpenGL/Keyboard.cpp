@@ -159,6 +159,7 @@ void Keyboard::key_callback(GLFWwindow* window, int key, int scancode, int actio
 			//set the projectile position and direction (push the sphere to the edge of the player)
 			projectile.object->position = g_pThePlayer->thePlayerObject->position + g_pThePlayer->forwardVector;
 			projectile.direction = g_pThePlayer->forwardVector;
+			projectile.projectileInitialPosition = g_pThePlayer->thePlayerObject->position;
 			//add the game object to draw
 			g_pThePlayer->projectilesToDraw.push_back(projectile.object);
 			//add the projectile to projectiles for keeping track of movement

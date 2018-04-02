@@ -36,11 +36,20 @@ void cFollowState::performAction(cGameObject* player, cGameObject* me, float del
 	glm::vec3 playerforwardVector = glm::vec3(1.0f, 0.0f, 0.0f);
 	playerforwardVector = VectorMultiplyMatrices(&RotationMatrix, &playerforwardVector);
 
+	//update the player forward vector
+	g_pThePlayer->forwardVector = playerforwardVector;
+
 	float playerLookingAtMe = glm::dot(forwardVector, playerforwardVector);
 
 	//determine what way the player is facing
+	//if (playerLookingAtMe < 0.0f) {
+	//	this->mAction = ActionType::EVADE;
+	//	this->isBehindPlayer = false;
+	//}
+
+	//FOLLOW NO MATTER WHAT WHILE IN RANGE
 	if (playerLookingAtMe < 0.0f) {
-		this->mAction = ActionType::EVADE;
+		this->mAction = ActionType::FOLLOW;
 		this->isBehindPlayer = false;
 	}
 	else if (playerLookingAtMe > 0.0f) {
@@ -91,8 +100,8 @@ void cFollowState::performAction(cGameObject* player, cGameObject* me, float del
 			direction = glm::normalize(direction);
 			direction.y = 0.0f;
 
-			if (glm::distance(player->position,me->position) <= 2.0f) {
-				performEnemyAction(player, me, forwardVector,deltaTime);
+			if (glm::distance(player->position,me->position) <= 4.0f) {
+				performEnemyAction(player, me, direction,deltaTime);
 			}
 			else {
 				//make the enemy move towards the player at a set speed 
@@ -134,6 +143,12 @@ void cFollowState::performAction(cGameObject* player, cGameObject* me, float del
 			//move towards the character 
 			glm::vec3 direction = player->position - me->position;
 			direction = glm::normalize(direction);
+
+			//doesnt matter if it's a player or enemy
+			if (glm::distance(me->position, player->position) < 5.0f) {
+				//make sure the enemy is within the radius for a second before doing any damage
+				performEnemyAction(player, me, direction, deltaTime);
+			}
 			direction.y = 0.0f;
 			//make the enemy move towards the player at a set speed 
 			me->position += direction * this->speed * deltaTime;			
@@ -141,15 +156,6 @@ void cFollowState::performAction(cGameObject* player, cGameObject* me, float del
 
 		//set the players orientation
 		me->orientation2.y += (rotationSpeed * rotAngle);
-
-		//make sure its the player that were close to 
-		if (g_pThePlayer->thePlayerObject == player) {
-			//make sure its within the radius
-			if (glm::distance(me->position, player->position) < 2.0f) {
-				//make sure the enemy is within the radius for a second before doing any damage
-				performEnemyAction(player, me,forwardVector,deltaTime);
-			}
-		}
 	}
 	else if (this->mAction == ActionType::IDLE) {
 		//do nothing

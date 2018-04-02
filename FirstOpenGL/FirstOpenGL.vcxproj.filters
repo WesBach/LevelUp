@@ -284,6 +284,12 @@
     <ClCompile Include="cEnemy.cpp">
       <Filter>Entities</Filter>
     </ClCompile>
+    <ClCompile Include="cParticleManager.cpp">
+      <Filter>Particles</Filter>
+    </ClCompile>
+    <ClCompile Include="cPowerUp.cpp">
+      <Filter>Items</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="cShaderManager.h">
@@ -519,6 +525,12 @@
     </ClInclude>
     <ClInclude Include="cEnemy.h">
       <Filter>Entities</Filter>
+    </ClInclude>
+    <ClInclude Include="cParticleManager.h">
+      <Filter>Particles</Filter>
+    </ClInclude>
+    <ClInclude Include="cPowerUp.h">
+      <Filter>Items</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

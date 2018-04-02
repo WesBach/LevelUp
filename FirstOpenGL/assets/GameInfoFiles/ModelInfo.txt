@@ -1,5 +1,5 @@
 NUM_MODELS_UV
-8
+11
 
 MODEL_NAME_UV_START
 Sphere_xyz_n_uv.ply
@@ -10,4 +10,6 @@ MeshLabTerrain_FLAT_xyz_n_uv.ply
 Viper_MkVII_ASCII_UVTex.ply
 Raider_ASCII_UVtex.ply
 mig29_xyz.ply
-
+health_pack.ply
+bullet.ply
+Sample_Ship.ply

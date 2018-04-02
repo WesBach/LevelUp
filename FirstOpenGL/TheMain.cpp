@@ -23,22 +23,16 @@
 #include "cMesh.h"
 #include "cShader.h"
 #include "cShaderManager.h" 
-
 #include "cGameObject.h"
 #include "cVAOMeshManager.h"
-
 #include "Physics.h"	// Physics collision detection functions
 #include "cLightManager.h"
 #include "Keyboard.h"
 #include "DebugRenderer.h"
-
 #include"CommandManager.h"
 #include "OrientToTime.h"
-
 #include "CTextureManager.h"
-
 #include "RenderUtilities.h"
-
 #include <iPhysicsFactory.h>
 #include <enums.h>
 #include "cPathingManager.h"
@@ -48,6 +42,8 @@
 #include "cPlayer.h"
 #include "cSceneManager.h"
 #include "cEnemy.h"
+#include "cParticleManager.h"
+#include "cPowerUp.h"
 
 bool loadTextures = false;
 int height = 480;	/* default */
@@ -58,8 +54,14 @@ void renderPlayerInfo(int winWidth, int winHeight);
 void printError(const std::string& error);
 void createProjectiles();
 void updateProjectilePositions(double deltaTime);
-void checkForProjectileCollisions();
+void checkForProjectileCollisions(float deltaTime);
 void checkObjectBounds();
+void removeEnemyOnEnemyDeath();
+void restartOnPlayerDeath();
+void loadNextLevel();
+void handleExplosions(float deltaTime);
+void checkForPowerUpCollisions();
+void checkPlayerProjectileRanges();
 
 std::string modelAndLightFile = "assets/GameInfoFiles/SceneInfo.txt";
 
@@ -69,11 +71,13 @@ cShaderManager*		g_pShaderManager;		// Heap, new (and delete)
 cLightManager*		g_pLightManager;
 DebugRenderer*		g_pTheDebugrender;
 CTextureManager*	g_pTextureManager;
-
+cParticleManager*	g_pParticleManager;
 std::vector<cEnemy> g_vecEnemies;
+std::vector<cEnemy> g_vecExplodedEnemies;
+std::vector<cPowerUp*> g_vecPowerUps;
+
 cPlayer* g_pThePlayer;
 sScene* g_pCurrentScene;
-
 cPathingManager* g_thePathingManager;
 cFBO* g_pFBO;
 cSceneManager* g_pSceneManager;
@@ -172,8 +176,9 @@ int main(int argc, char** argv)
 		return -1;
 		//		exit(
 	}
-
-	//Scene manager
+	//////////////////
+	//Scene manager///
+	/////////////////
 	::g_pSceneManager = new cSceneManager();
 	::g_pVAOManager = new cVAOMeshManager();
 	sexyShaderID = ::g_pShaderManager->getIDFromFriendlyName("mySexyShader");
@@ -187,9 +192,9 @@ int main(int argc, char** argv)
 		return -1;
 	}
 	g_pSceneManager->LoadSceneFromFileIntoSceneMap(std::string("assets/GameInfoFiles/Scene1.txt"), 0);
-	//g_pSceneManager->LoadSceneFromFileIntoSceneMap(std::string("assets/GameInfoFiles/Scene2.txt"), 1);
-	//g_pSceneManager->LoadSceneFromFileIntoSceneMap(std::string("assets/GameInfoFiles/Scene3.txt"), 2);
-	//g_pSceneManager->LoadSceneFromFileIntoSceneMap(std::string("assets/GameInfoFiles/Scene4.txt"), 3);
+	g_pSceneManager->LoadSceneFromFileIntoSceneMap(std::string("assets/GameInfoFiles/Scene2.txt"), 1);
+	g_pSceneManager->LoadSceneFromFileIntoSceneMap(std::string("assets/GameInfoFiles/Scene3.txt"), 2);
+	g_pSceneManager->LoadSceneFromFileIntoSceneMap(std::string("assets/GameInfoFiles/Scene4.txt"), 3);
 
 	//populate scene appropriately
 	sScene tempScene = g_pSceneManager->getSceneById(0);
@@ -200,10 +205,21 @@ int main(int argc, char** argv)
 	g_pThePlayer = new cPlayer();
 	g_pThePlayer->thePlayerObject = g_pCurrentScene->players[0];
 	g_pThePlayer->currentHealth = 100;
-	g_pThePlayer->playerSpeed = 2.0f;
+	g_pThePlayer->playerSpeed = 4.0f;
 	g_pThePlayer->rotationSpeed = 2.0f;
+	createProjectiles();
 	//populate the enemies
 	g_pSceneManager->populateEnemies(g_vecEnemies,g_pCurrentScene);
+	g_pSceneManager->configurePowerUpsForScene(g_pCurrentScene, g_vecPowerUps);
+
+	////////////////////////
+	////PARTICLE MANAGER///
+	//////////////////////
+	//create the particle manager
+	g_pParticleManager = new cParticleManager();
+	//create enough emitters for each enemy
+	g_pParticleManager->createEmitters(g_vecEnemies.size());
+	g_pParticleManager->connectEmittersWithEntities(g_vecEnemies);
 
 	  /////////////////////
 	 //	Debug Renderer	//
@@ -268,9 +284,21 @@ int main(int argc, char** argv)
 		std::cout << "Didn't load skybox" << std::endl;
 	}
 
-	//map the textures
-	MapTexturesToProperObjects();
+	::g_pTextureManager->setBasePath("assets/textures/skybox");
+	if (!::g_pTextureManager->CreateCubeTextureFromBMPFiles(
+		"sunny",
+		"TropicalSunnyDayRight2048.bmp",
+		"TropicalSunnyDayLeft2048.bmp",
+		"TropicalSunnyDayDown2048.bmp",//TropicalSunnyDayUp2048
+		"TropicalSunnyDayUp2048.bmp",//TropicalSunnyDayDown2048
+		"TropicalSunnyDayFront2048.bmp",
+		"TropicalSunnyDayBack2048.bmp", true, true))
+	{
+		std::cout << "Didn't load skybox" << std::endl;
+	}
 
+	//load the textures for the scene
+	g_pSceneManager->loadLevelTextures(g_pCurrentScene);
 
 	glEnable(GL_DEPTH);
 	glCullFace(GL_BACK);
@@ -295,7 +323,6 @@ int main(int argc, char** argv)
 	}
 
 
-	createProjectiles();
 
 	// Main game or application loop
 	while (!glfwWindowShouldClose(g_pGLFWWindow))
@@ -344,13 +371,20 @@ int main(int argc, char** argv)
 				Keyboard::key_resolution(i);
 			}
 		}
+
+		double curTime = glfwGetTime();
+		double deltaTime = curTime - g_lastTimeStep;
+
 		//make sure the objects dont go outside the bounds
 		checkObjectBounds();
+
+
 
 		//render the scene
 		renderScene(::g_pCurrentScene->terrain, g_pGLFWWindow);
 		renderScene(::g_pCurrentScene->enemies, g_pGLFWWindow);
 		renderScene(::g_pCurrentScene->players, g_pGLFWWindow);
+		renderScene(::g_pCurrentScene->powerUps, g_pGLFWWindow);
 
 		//Render the enemy projectiles
 		for (int i = 0; i < g_vecEnemies.size(); i++)
@@ -363,6 +397,20 @@ int main(int argc, char** argv)
 			renderScene(::g_pThePlayer->projectilesToDraw, g_pGLFWWindow);
 		}
 
+
+		//draw explosions
+		for (int i = 0; i < g_vecExplodedEnemies.size(); i++) {
+			renderScene(::g_vecExplodedEnemies[i].explosion, g_pGLFWWindow);
+		}
+
+		//render the particles last so that transparency works properly
+		g_pParticleManager->updateEmitterPositions(g_vecEnemies, g_pThePlayer);
+		g_pParticleManager->drawActiveParticles(sexyShaderID);
+		//update particles 
+		g_pParticleManager->updateLivingParticles(deltaTime);
+
+
+		//Deal with the ai actions
 		for (int i = 0; i < g_pCurrentScene->enemies.size(); i++) {
 			if (g_pCurrentScene->enemies[i]->theState != NULL) {
 				//of the type is a follower make sure to check all the objects in the scene to see what one is closest
@@ -382,6 +430,15 @@ int main(int argc, char** argv)
 
 					glm::vec3 closest(0.0f);
 					float distance = 0.0f;
+
+					//if it's the only enemy left in the vector jsut test against the player
+					if (thePositions.size() == 0) {
+						//perform action against the player
+						g_pCurrentScene->enemies[i]->theState->performAction(g_pCurrentScene->players[0], g_pCurrentScene->enemies[i], (float)1 / 60);
+						continue;
+					}
+
+					//otherwise find the closest enemy
 					distance = abs(glm::distance(g_pCurrentScene->enemies[i]->position, thePositions[0]));
 					//get the closest position
 					for (int distIndex = 1; distIndex < thePositions.size(); distIndex++){
@@ -395,15 +452,17 @@ int main(int argc, char** argv)
 
 					//test against closest enemy
 					for (int objectIndex = 0; objectIndex < theCopyVec.size(); objectIndex++) {
+						//find the closest enemy adn perform an action
 						if (closest == theCopyVec[objectIndex]->position) {
 							g_pCurrentScene->enemies[i]->theState->performAction(theCopyVec[objectIndex], g_pCurrentScene->enemies[i], (float)1 / 60);
+							break;
 						}
 					}
 
 				}
 				g_pCurrentScene->enemies[i]->theState->performAction(g_pCurrentScene->players[0], g_pCurrentScene->enemies[i], (float)1 / 60);
 			}
-		}
+		}//end ai actions
 
 
 		std::stringstream ssTitle;
@@ -413,21 +472,28 @@ int main(int argc, char** argv)
 			<< g_cameraXYZ.z;
 		glfwSetWindowTitle(g_pGLFWWindow, ssTitle.str().c_str());
 
-		double curTime = glfwGetTime();
-		double deltaTime = curTime - g_lastTimeStep;
-
 		//update projectile positions
 		updateProjectilePositions(deltaTime);
+		//handle explosions
+		handleExplosions(deltaTime);
+		//check for collisions between projectiles entities	
+		checkForProjectileCollisions(deltaTime);
+		checkForPowerUpCollisions();
 
-		//TODO:: check for collisions between projectiles and enemies	
-		checkForProjectileCollisions();
-		
+		//make sure the player projectiles don't go too far
+		checkPlayerProjectileRanges();
+		//deal with death
+		removeEnemyOnEnemyDeath();
+		restartOnPlayerDeath();
 
 		//draw the bounding boxes
 		::g_pTheDebugrender->RenderDebugObjects(v, p, deltaTime);
 
 		//render screen text
 		renderPlayerInfo(width, height);
+
+		//check to see if the enemies have died and move to next level
+		loadNextLevel();
 
 		//switch back
 		g_lastTimeStep = curTime;
@@ -445,19 +511,49 @@ int main(int argc, char** argv)
 	delete ::g_pThePlayer;
 	delete ::g_curGameObject;
 	delete ::g_thePathingManager;
+	delete ::g_pParticleManager;
+	delete ::g_pSceneManager;
+	delete ::g_pCurrentScene;
 	return 0;
-}
-
-void getUniformLocations(int& mvp_location, int &currentProgID) {
-	// Get the uniform locations for this shader
-
 }
 
 void printError(const std::string& error) {
 	std::cout << error << std::endl;
 }
 
-void checkForProjectileCollisions() {
+void checkForPowerUpCollisions() {
+	std::vector<bool> powerupsToRemove;
+
+	for (int i = 0; i < g_vecPowerUps.size(); i++) {
+		if (glm::distance(g_vecPowerUps[i]->thePowerUp->position, g_pThePlayer->thePlayerObject->position) < g_pThePlayer->thePlayerObject->scale/2.f) {
+			//get the power up type 
+			ePickupType type = g_vecPowerUps[i]->getPowerUpType();
+			if (type == ePickupType::PICKUP_HEALTH) {
+				g_pThePlayer->currentHealth += g_vecPowerUps[i]->modifierValue;
+			}
+			else if (type == ePickupType::PICKUP_RANGE_INCREASE) {
+				g_pThePlayer->projectileRange += g_vecPowerUps[i]->modifierValue;
+				g_pThePlayer->setProjectileRange();
+			}
+			//set the power up to be removed
+			powerupsToRemove.push_back(true);
+		}
+		else {
+			powerupsToRemove.push_back(false);
+		}
+	}
+
+	//remove the pickup from the draw vector and pickup vector
+	for (int i = 0; i < powerupsToRemove.size(); i++) {
+		if (powerupsToRemove[i] == true) {
+			//remove from both vectors
+			g_vecPowerUps.erase(g_vecPowerUps.begin() + i);
+			g_pCurrentScene->powerUps.erase(g_pCurrentScene->powerUps.begin() + i);
+		}
+	}
+}
+
+void checkForProjectileCollisions( float deltaTime) {
 
 	std::vector<bool> theObjectsForRemoval;
 	bool collided = false;
@@ -468,9 +564,15 @@ void checkForProjectileCollisions() {
 
 			if (glm::distance(g_pThePlayer->projectiles[i].object->position, g_pCurrentScene->enemies[index]->position) < g_pCurrentScene->enemies[index]->scale / 3.f)
 			{
-				//objects are colliding
-				//TODO:: implement enemy health and damage
+				//objects are colliding do damage
+				g_vecEnemies[index].health -= g_pThePlayer->projectiles[i].damage;
 
+				//check to see if the enemy is low health(will only add the emitter if it isn't already present)
+				if (g_vecEnemies[index].health < g_vecEnemies[index].maxHealth / 2.f)
+				{
+					//try to add the emitter to the active emitters
+					g_pParticleManager->setEnemyEmitterToActive(g_vecEnemies[index].particleManagerEmitterIndex);
+				}
 				//remove the projectile from the scene
 				collided = true;
 				//break out of this loop and add the bool to the vector
@@ -506,6 +608,11 @@ void checkForProjectileCollisions() {
 			if (glm::distance(g_vecEnemies[i].projectilesToDraw[projectilIndex]->position, g_pThePlayer->thePlayerObject->position) < g_pThePlayer->thePlayerObject->scale /2.f) {
 				//do damage to the player
 				g_pThePlayer->currentHealth -= g_vecEnemies[i].projectiles[projectilIndex].damage;
+
+				//set emitter to active
+				if (g_pThePlayer->currentHealth < g_pThePlayer->maxHealth / 2.f) {
+					g_pParticleManager->setPlayerEmitterToActive();
+				}
 				//flag this index to be removed
 				removals.push_back(true);
 			}
@@ -539,8 +646,35 @@ void checkForProjectileCollisions() {
 		}
 	}
 
-}
+	//check for the explosion hitting the player
+	for (int i = 0; i < g_vecExplodedEnemies.size(); i++)
+	{
+		if (glm::distance(g_vecExplodedEnemies[i].explosion[0]->position, g_pThePlayer->thePlayerObject->position) < g_vecExplodedEnemies[i].explosion[0]->scale)
+		{
+			g_pThePlayer->isInExplosionRadius = true;
+			if (g_pThePlayer->timeInExplosion >= 1.0f)
+			{
+				//the player is inside the explosion for long enough to take damage
+				if (g_pThePlayer->currentHealth < 20.f) {
+					g_pThePlayer->currentHealth = 0.0f;
+				}
+				else {
+					g_pThePlayer->currentHealth -= 20.f;
+				}
+				//reset the damage timer
+				g_pThePlayer->timeInExplosion = 0.0f;
 
+				if (g_pThePlayer->currentHealth < g_pThePlayer->maxHealth / 2.f) {
+					g_pParticleManager->setPlayerEmitterToActive();
+				}
+			}
+			else {
+				g_pThePlayer->timeInExplosion += deltaTime;
+			}
+		}
+	}
+
+}
 
 void renderPlayerInfo(int winWidth, int winHeight) {
 
@@ -713,6 +847,28 @@ void checkObjectBounds() {
 
 }
 
+void checkPlayerProjectileRanges() {
+	std::vector<bool> projectilesToRemove;
+
+	for (int i = 0; i < g_pThePlayer->projectiles.size(); i++) {
+		//make sure the projectiles don't go over their range
+		if (glm::distance(g_pThePlayer->projectiles[i].object->position, g_pThePlayer->projectiles[i].projectileInitialPosition) >= g_pThePlayer->projectiles[i].projectileRange) {
+			projectilesToRemove.push_back(true);
+		}
+		else {
+			projectilesToRemove.push_back(false);
+		}
+	}
+
+	//remove the projectiles
+	for (int i = 0; i < projectilesToRemove.size(); i++) {
+		if (projectilesToRemove[i] == true) {
+			g_pThePlayer->projectiles.erase(g_pThePlayer->projectiles.begin() + i);
+			g_pThePlayer->projectilesToDraw.erase(g_pThePlayer->projectilesToDraw.begin() + i);
+		}
+	}
+}
+
 void createProjectiles() {
 
 	cGameObject* tempObject;
@@ -732,13 +888,12 @@ void createProjectiles() {
 		tempProjectile.object = tempObject;
 		tempProjectile.speed = 2.f;
 		tempProjectile.inUse = false;
+		tempProjectile.projectileRange = 10.f;
 		g_pThePlayer->projectilePool.push_back(tempProjectile);
 	}
 }
 
 void updateProjectilePositions(double deltaTime) {
-
-	//Euler Integration
 
 	//look through the current player projectiles and update their positions
 	for (int i = 0; i < g_pThePlayer->projectiles.size(); i++) {
@@ -756,6 +911,131 @@ void updateProjectilePositions(double deltaTime) {
 			float speed = g_vecEnemies[i].projectiles[index].speed;
 			glm::vec3 direction = g_vecEnemies[i].projectiles[index].direction;
 			g_vecEnemies[i].projectiles[index].object->position += (direction * speed) * (float)deltaTime;
+		}
+	}
+}
+
+void removeEnemyOnEnemyDeath() {
+	std::vector<bool> isDead;
+
+	//check to see if any enemy is dead
+	for (int i = 0; i < g_vecEnemies.size(); i++) {
+		if (g_vecEnemies[i].health <= 0.f)
+		{
+			isDead.push_back(true);
+		}
+		else {
+			isDead.push_back(false);
+		}
+	}
+
+	//remove the dead enemies if any
+	for (int i = 0; i < isDead.size(); i++) {
+		if (isDead[i] == true) {
+			//remove the enemy particles
+			g_pParticleManager->deactivateEmitter(g_vecEnemies[i].particleManagerEmitterIndex);
+			//remove the enemy from the enemy vector
+			g_vecEnemies.erase(g_vecEnemies.begin() + i);
+			//remove the enemy from the scene
+			g_pCurrentScene->enemies.erase(g_pCurrentScene->enemies.begin() + i);
+		}
+	}
+}
+
+void restartOnPlayerDeath() {
+
+	if (g_pThePlayer->currentHealth <= 0.f)
+	{
+		//restart at the first level
+		sScene tempScene = g_pSceneManager->getSceneById(0);
+		g_pSceneManager->copySceneFromCopyToPointer(tempScene, g_pCurrentScene);
+
+		//populate the player
+		g_pThePlayer->thePlayerObject = g_pCurrentScene->players[0];
+		g_pThePlayer->currentHealth = 100;
+		g_pThePlayer->playerSpeed = 4.0f;
+		g_pThePlayer->rotationSpeed = 2.0f;
+		//populate the enemies
+		g_pSceneManager->populateEnemies(g_vecEnemies, g_pCurrentScene);
+		g_pSceneManager->loadLevelTextures(g_pCurrentScene);
+
+		//clear the emitters
+		g_pParticleManager->clearAllEmitters();
+		//add the emitters again
+		g_pParticleManager->createEmitters(g_vecEnemies.size());
+		g_pParticleManager->connectEmittersWithEntities(g_vecEnemies);
+
+		//clear explosion vector
+		g_vecExplodedEnemies.clear();
+		//reload the projectiles into the player
+		createProjectiles();
+	}
+}
+
+void loadNextLevel() {
+	if (g_pCurrentScene->enemies.size() == 0 && g_vecExplodedEnemies.size() == 0)
+	{
+		//go to next level
+		g_pSceneManager->loadNextLevel(g_pCurrentScene,g_pThePlayer);
+		g_pSceneManager->loadLevelTextures(g_pCurrentScene);
+		g_pSceneManager->populateEnemies(g_vecEnemies,g_pCurrentScene);
+
+		//clear the particle system and rebuild for next level
+		g_pParticleManager->clearAllEmitters();
+		g_pParticleManager->createEmitters(g_vecEnemies.size());
+		g_pParticleManager->connectEmittersWithEntities(g_vecEnemies);
+	}
+}
+
+void handleExplosions(float deltaTime) {
+	std::vector<bool> explosionsToRemove;	
+
+	//remove the exploding enemies
+	for (int i = 0; i < g_vecEnemies.size(); i++)
+	{
+		if (g_vecEnemies[i].isExploding)
+		{
+			explosionsToRemove.push_back(true);
+		}
+		else {
+			explosionsToRemove.push_back(false);
+		}
+	}
+
+	//remove the enemy from the enemy drawing vector add it to the explosion vector
+	for (int i = 0; i < explosionsToRemove.size(); i++)
+	{
+		if (explosionsToRemove[i] == true)
+		{
+			//keep track of the enemy that exploded
+			g_vecExplodedEnemies.push_back(g_vecEnemies[i]);
+			//remove the emitter from the active ones
+			g_pParticleManager->deactivateEmitter(g_vecEnemies[i].particleManagerEmitterIndex);
+			g_vecEnemies.erase(g_vecEnemies.begin()+i);
+			g_pCurrentScene->enemies.erase(g_pCurrentScene->enemies.begin() + i);
+		}
+	}
+
+	//deal with the explosion growth
+	for (int i = 0; i < g_vecExplodedEnemies.size(); i++) {
+		if (g_vecExplodedEnemies[i].explosion[0]->scale < g_vecExplodedEnemies[i].explosionSize)
+		{
+			g_vecExplodedEnemies[i].explosion[0]->scale += deltaTime;
+			if (g_vecExplodedEnemies[i].explosion[0]->vecMehs2DTextures.size() == 0)
+			{
+				//add the blue fire texture and set the object to be slightly transparent
+				g_vecExplodedEnemies[i].explosion[0]->vecMehs2DTextures.push_back(sTextureBindBlendInfo("bluefire.bmp", 0.75f));
+			}
+			else if (g_vecExplodedEnemies[i].explosion[0]->scale >= 5.f) {
+				//add the explosion texture
+				if (g_vecExplodedEnemies[i].explosion[0]->vecMehs2DTextures.size() == 1) {
+					g_vecExplodedEnemies[i].explosion[0]->vecMehs2DTextures.push_back(sTextureBindBlendInfo("explosion.bmp", 0.25f));
+				}
+			}
+		}
+		else {
+			//remove the enemy from the exploding vector
+			g_vecExplodedEnemies.erase(g_vecExplodedEnemies.begin()+i);
 		}
 	}
 }

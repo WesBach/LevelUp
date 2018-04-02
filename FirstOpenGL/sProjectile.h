@@ -18,6 +18,7 @@ enum eProjectileDamageType {
 
 struct sProjectile {
 	glm::vec3 direction;
+	glm::vec3 projectileInitialPosition;
 	float speed = 0.0f;
 	cGameObject* object = NULL;
 	int damage = -1;

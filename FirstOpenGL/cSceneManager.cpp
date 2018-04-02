@@ -8,6 +8,8 @@
 #include "cFollowState.h"
 #include "cPlayer.h"
 #include "cEnemy.h"
+#include "cPowerUp.h"
+#include "cEmitter.h"
 
 #include <iostream>
 #include <sstream>
@@ -84,10 +86,23 @@ bool  cSceneManager::LoadSceneFromFileIntoSceneMap(std::string& fileName, int ma
 		}
 	}
 
+	//populate the enemies
+	int numPowerups;
+	ReadFileToToken(sceneInfo, "NUMBER_OF_POWERUPS");
+	sceneInfo >> numPowerups;
+	ReadFileToToken(sceneInfo, "POWERUPS");
+
+	for (int i = 0; i < numPowerups; i++)
+	{
+		loadObjectData(sceneInfo, tempScene->powerUps);
+	}
+
 	//close the file stream
 	sceneInfo.close();
 	//add the scene to the map
 	this->mSceneMap[mapIndex] = tempScene;
+
+	this->numLevels = this->mSceneMap.size()-1;
 	return true;
 }
 
@@ -163,6 +178,10 @@ sScene cSceneManager::getSceneById(int id) {
 void cSceneManager::copySceneFromCopyToPointer(const sScene& copyFrom, sScene* copyTo) {
 	
 	sScene temp = copyFrom;
+	//clear the previous scene
+	copyTo->enemies.clear();
+	copyTo->players.clear();
+	copyTo->terrain.clear();
 	//make new objects with the game object copies
 	for (int i = 0; i < temp.enemies.size(); i++)
 	{
@@ -177,6 +196,11 @@ void cSceneManager::copySceneFromCopyToPointer(const sScene& copyFrom, sScene* c
 	for (int i = 0; i < temp.players.size(); i++)
 	{
 		copyTo->players.push_back(new cGameObject(*temp.players[i]));
+	}
+
+	for (int i = 0; i < temp.powerUps.size(); i++)
+	{
+		copyTo->powerUps.push_back(new cGameObject(*temp.powerUps[i]));
 	}
 
 }
@@ -404,23 +428,29 @@ bool cSceneManager::LoadPlyFileIntoMeshWithNormals(std::string filename, cMesh &
 }
 
 void cSceneManager::populateEnemies(std::vector<cEnemy>& enemies, sScene* theScene) {
+	//clear the vector
+	enemies.clear();
 
 	//populate the enemies
 	for (int i = 0; i < theScene->enemies.size(); i++) {
 		StateType stateType = theScene->enemies[i]->theState->getStateType();
 		eAttackType attackType;
 		cEnemy enemy;
+		//set the emitter position
+		//enemy.theParticleEmitter->position = theScene->enemies[i]->position;
 
 		//check the state of the object
 		if (stateType == StateType::FOLLOWER) {
 			attackType = eAttackType::EXPLOSION;
 			enemy.enemyType = eEnemyType::SUICIDE;
 			enemy.health = 100.f;
+			enemy.maxHealth = 100.f;
 		}
 		else {
 			enemy.enemyType = eEnemyType::GUNNER;
 			attackType = eAttackType::PROJECTILE;
 			enemy.health = 150.f;
+			enemy.maxHealth = 150.f;
 		}
 
 		//set the attack type
@@ -428,5 +458,279 @@ void cSceneManager::populateEnemies(std::vector<cEnemy>& enemies, sScene* theSce
 		enemy.theEnemyObject = theScene->enemies[i];
 		//add the enemy
 		enemies.push_back(enemy);
+	}
+}
+
+cSceneManager::cSceneManager() {
+	this->currentLevel = 0;
+	this->numLevels = 0;
+}
+
+void cSceneManager::loadLevelTextures(sScene* theScene) {
+	
+	//based on current level load textures
+	switch (this->currentLevel) {
+		//level 1
+		case 0:
+			for (int i = 0; i < theScene->enemies.size(); i++)
+			{
+
+				if (theScene->enemies[i]->meshName == "mig29_xyz.ply")
+				{
+					theScene->enemies[i]->vecMehs2DTextures.push_back(sTextureBindBlendInfo("leaves.bmp", 1.0f));
+				}
+				else if (theScene->enemies[i]->meshName == "Raider_ASCII_UVtex.ply")
+				{
+					theScene->enemies[i]->vecMehs2DTextures.push_back(sTextureBindBlendInfo("lava.bmp", 1.0f));
+				}
+				else if (theScene->enemies[i]->meshName == "Viper_MkVII_ASCII_UVTex.ply")
+				{
+					theScene->enemies[i]->vecMehs2DTextures.push_back(sTextureBindBlendInfo("rust.bmp", 0.5f));
+				}
+			}
+
+
+			for (int i = 0; i < theScene->terrain.size(); i++)
+			{
+				if (theScene->terrain[i]->meshName == "MeshLabTerrain_FLAT_xyz_n_uv.ply")
+				{
+					theScene->terrain[i]->vecMehs2DTextures.push_back(sTextureBindBlendInfo("realistic-wet-grassl.bmp", 1.f));
+				}
+				else if (theScene->terrain[i]->meshName == "SmoothSphere_Inverted_Normals_xyz_n.ply")
+				{
+					theScene->terrain[i]->vecMeshCubeMaps.push_back(sTextureBindBlendInfo("space", 1.0f));
+					theScene->terrain[i]->bIsSkyBoxObject = true;
+				}
+			}
+
+			for (int i = 0; i < theScene->players.size(); i++)
+			{
+				if (theScene->players[i]->meshName == "Utah_Teapot_xyz_n_uv.ply")
+				{
+					theScene->players[i]->vecMehs2DTextures.push_back(sTextureBindBlendInfo("lightning.bmp", 1.0f));
+				}
+				if (theScene->players[i]->meshName == "Sample_Ship.ply")
+				{
+					theScene->players[i]->vecMehs2DTextures.push_back(sTextureBindBlendInfo("sh3.bmp", 1.0f));
+				}
+				//Sample_Ship.ply
+			}
+
+			for (int i = 0; i < theScene->powerUps.size(); i++)
+			{
+				if (theScene->powerUps[i]->meshName == "health_pack.ply")
+				{
+					theScene->powerUps[i]->vecMehs2DTextures.push_back(sTextureBindBlendInfo("health.bmp", 1.0f));
+				}
+				if (theScene->powerUps[i]->meshName == "bullet.ply")
+				{
+					theScene->powerUps[i]->vecMehs2DTextures.push_back(sTextureBindBlendInfo("gold.bmp", 1.0f));
+				}
+			}
+			break;
+
+		//level 2
+		case 1:
+			for (int i = 0; i < theScene->enemies.size(); i++)
+			{
+				if (theScene->enemies[i]->meshName == "mig29_xyz.ply")
+				{
+					theScene->enemies[i]->vecMehs2DTextures.push_back(sTextureBindBlendInfo("leaves.bmp", 1.0f));
+				}
+				else if (theScene->enemies[i]->meshName == "Raider_ASCII_UVtex.ply")
+				{
+					theScene->enemies[i]->vecMehs2DTextures.push_back(sTextureBindBlendInfo("lava.bmp", 1.0f));
+				}
+				else if (theScene->enemies[i]->meshName == "Viper_MkVII_ASCII_UVTex.ply")
+				{
+					theScene->enemies[i]->vecMehs2DTextures.push_back(sTextureBindBlendInfo("rust.bmp", 0.5f));
+				}
+			}
+
+
+			for (int i = 0; i < theScene->terrain.size(); i++)
+			{
+				if (theScene->terrain[i]->meshName == "MeshLabTerrain_FLAT_xyz_n_uv.ply")
+				{
+					theScene->terrain[i]->vecMehs2DTextures.push_back(sTextureBindBlendInfo("ground_grass.bmp", 0.5f));
+				}
+				else if (theScene->terrain[i]->meshName == "SmoothSphere_Inverted_Normals_xyz_n.ply")
+				{
+					theScene->terrain[i]->vecMeshCubeMaps.push_back(sTextureBindBlendInfo("sunny", 1.0f));
+					theScene->terrain[i]->bIsSkyBoxObject = true;
+				}
+			}
+
+			for (int i = 0; i < theScene->players.size(); i++)
+			{
+				if (theScene->players[i]->meshName == "Utah_Teapot_xyz_n_uv.ply")
+				{
+					theScene->players[i]->vecMehs2DTextures.push_back(sTextureBindBlendInfo("TropicalSunnyDayBack2048.bmp", 0.5f));
+				}
+			}
+
+
+			for (int i = 0; i < theScene->powerUps.size(); i++)
+			{
+				if (theScene->powerUps[i]->meshName == "health_pack.ply")
+				{
+					theScene->powerUps[i]->vecMehs2DTextures.push_back(sTextureBindBlendInfo("health.bmp", 1.0f));
+				}
+				if (theScene->powerUps[i]->meshName == "bullet.ply")
+				{
+					theScene->powerUps[i]->vecMehs2DTextures.push_back(sTextureBindBlendInfo("gold.bmp", 1.0f));
+				}
+			}
+			break;
+
+		//level 3
+		case 2:
+			for (int i = 0; i < theScene->enemies.size(); i++)
+			{
+				if (theScene->enemies[i]->meshName == "mig29_xyz.ply")
+				{
+					theScene->enemies[i]->vecMehs2DTextures.push_back(sTextureBindBlendInfo("leaves.bmp", 1.0f));
+				}
+				else if (theScene->enemies[i]->meshName == "Raider_ASCII_UVtex.ply")
+				{
+					theScene->enemies[i]->vecMehs2DTextures.push_back(sTextureBindBlendInfo("lava.bmp", 1.0f));
+				}
+				else if (theScene->enemies[i]->meshName == "Viper_MkVII_ASCII_UVTex.ply")
+				{
+					theScene->enemies[i]->vecMehs2DTextures.push_back(sTextureBindBlendInfo("rust.bmp", 0.5f));
+				}
+			}
+
+
+			for (int i = 0; i < theScene->terrain.size(); i++)
+			{
+				if (theScene->terrain[i]->meshName == "MeshLabTerrain_FLAT_xyz_n_uv.ply")
+				{
+					theScene->terrain[i]->vecMehs2DTextures.push_back(sTextureBindBlendInfo("lava.bmp", 0.5f));
+				}
+				else if (theScene->terrain[i]->meshName == "SmoothSphere_Inverted_Normals_xyz_n.ply")
+				{
+					theScene->terrain[i]->vecMeshCubeMaps.push_back(sTextureBindBlendInfo("space", 1.0f));
+					theScene->terrain[i]->bIsSkyBoxObject = true;
+				}
+			}
+
+			for (int i = 0; i < theScene->players.size(); i++)
+			{
+				if (theScene->players[i]->meshName == "Utah_Teapot_xyz_n_uv.ply")
+				{
+					theScene->players[i]->vecMehs2DTextures.push_back(sTextureBindBlendInfo("TropicalSunnyDayBack2048.bmp", 0.5f));
+				}
+			}
+
+
+			for (int i = 0; i < theScene->powerUps.size(); i++)
+			{
+				if (theScene->powerUps[i]->meshName == "health_pack.ply")
+				{
+					theScene->powerUps[i]->vecMehs2DTextures.push_back(sTextureBindBlendInfo("health.bmp", 1.0f));
+				}
+				if (theScene->powerUps[i]->meshName == "bullet.ply")
+				{
+					theScene->powerUps[i]->vecMehs2DTextures.push_back(sTextureBindBlendInfo("gold.bmp", 1.0f));
+				}
+			}
+			break;
+
+
+		case 3:
+			for (int i = 0; i < theScene->enemies.size(); i++)
+			{
+				if (theScene->enemies[i]->meshName == "mig29_xyz.ply")
+				{
+					theScene->enemies[i]->vecMehs2DTextures.push_back(sTextureBindBlendInfo("leaves.bmp", 1.0f));
+				}
+				else if (theScene->enemies[i]->meshName == "Raider_ASCII_UVtex.ply")
+				{
+					theScene->enemies[i]->vecMehs2DTextures.push_back(sTextureBindBlendInfo("lava.bmp", 1.0f));
+				}
+				else if (theScene->enemies[i]->meshName == "Viper_MkVII_ASCII_UVTex.ply")
+				{
+					theScene->enemies[i]->vecMehs2DTextures.push_back(sTextureBindBlendInfo("rust.bmp", 0.5f));
+				}
+			}
+
+
+			for (int i = 0; i < theScene->terrain.size(); i++)
+			{
+				if (theScene->terrain[i]->meshName == "MeshLabTerrain_FLAT_xyz_n_uv.ply")
+				{
+					theScene->terrain[i]->vecMehs2DTextures.push_back(sTextureBindBlendInfo("lava.bmp", 0.5f));
+				}
+				else if (theScene->terrain[i]->meshName == "SmoothSphere_Inverted_Normals_xyz_n.ply")
+				{
+					theScene->terrain[i]->vecMeshCubeMaps.push_back(sTextureBindBlendInfo("space", 1.0f));
+					theScene->terrain[i]->bIsSkyBoxObject = true;
+				}
+			}
+
+			for (int i = 0; i < theScene->players.size(); i++)
+			{
+				if (theScene->players[i]->meshName == "Utah_Teapot_xyz_n_uv.ply")
+				{
+					theScene->players[i]->vecMehs2DTextures.push_back(sTextureBindBlendInfo("TropicalSunnyDayBack2048.bmp", 0.5f));
+				}
+			}
+
+
+			for (int i = 0; i < theScene->powerUps.size(); i++)
+			{
+				if (theScene->powerUps[i]->meshName == "health_pack.ply")
+				{
+					theScene->powerUps[i]->vecMehs2DTextures.push_back(sTextureBindBlendInfo("health.bmp", 1.0f));
+				}
+				if (theScene->powerUps[i]->meshName == "bullet.ply")
+				{
+					theScene->powerUps[i]->vecMehs2DTextures.push_back(sTextureBindBlendInfo("gold.bmp", 1.0f));
+				}
+			}
+			break;
+
+	}
+}
+
+void cSceneManager::loadNextLevel(sScene* g_pCurrentScene,cPlayer* thePlayer) {
+
+	if (this->currentLevel == this->numLevels) {
+		this->currentLevel = 0;
+	}
+	else {
+		this->currentLevel++;
+	}
+
+	//load the scene info
+	sScene tempScene = this->getSceneById(this->currentLevel);
+	this->copySceneFromCopyToPointer(tempScene, g_pCurrentScene);
+
+	//populate the player
+	thePlayer->thePlayerObject = g_pCurrentScene->players[0];
+	thePlayer->currentHealth = 100;
+	thePlayer->playerSpeed = 4.0f;
+	thePlayer->rotationSpeed = 2.0f;
+	thePlayer->projectiles.clear();
+	thePlayer->projectilesToDraw.clear();
+	//reset the projectiles
+	for (int i = 0; i < thePlayer->projectilePool.size(); i++) {
+		thePlayer->projectilePool[i].inUse = false;
+	}
+}
+
+
+void cSceneManager::configurePowerUpsForScene(sScene* theScene,std::vector<cPowerUp*>& thePowerups) {
+
+	thePowerups.clear();
+	//set the modifiers
+	for (int i = 0; i < theScene->powerUps.size(); i++) {
+		if (theScene->powerUps[i]->meshName == "health_pack.ply") {			
+			thePowerups.push_back(new cPowerUp(eModifierType::MODIFIER_HEALTH,ePickupType::PICKUP_HEALTH, theScene->powerUps[i]));
+		}
+		else if (theScene->powerUps[i]->meshName == "bullet.ply") {
+			thePowerups.push_back(new cPowerUp(eModifierType::MODIFIER_RANGE_INCREASE,ePickupType::PICKUP_RANGE_INCREASE, theScene->powerUps[i]));
+		}	
 	}
 }

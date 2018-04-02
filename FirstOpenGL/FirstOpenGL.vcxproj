@@ -180,9 +180,11 @@
     <ClCompile Include="cMenuRenderer.cpp" />
     <ClCompile Include="cMesh.cpp" />
     <ClCompile Include="CommandManager.cpp" />
+    <ClCompile Include="cParticleManager.cpp" />
     <ClCompile Include="cPathingManager.cpp" />
     <ClCompile Include="cPathingNode.cpp" />
     <ClCompile Include="cPhysicalProperties.cpp" />
+    <ClCompile Include="cPowerUp.cpp" />
     <ClCompile Include="cPlayer.cpp" />
     <ClCompile Include="cSceneManager.cpp" />
     <ClCompile Include="cShader.cpp" />
@@ -248,10 +250,12 @@
     <ClInclude Include="cMesh.h" />
     <ClInclude Include="CommandManager.h" />
     <ClInclude Include="cParticle.h" />
+    <ClInclude Include="cParticleManager.h" />
     <ClInclude Include="cPathingManager.h" />
     <ClInclude Include="cPathingNode.h" />
     <ClInclude Include="cPhysicalProperties.h" />
     <ClInclude Include="cCuriousState.h" />
+    <ClInclude Include="cPowerUp.h" />
     <ClInclude Include="cPlayer.h" />
     <ClInclude Include="cSceneManager.h" />
     <ClInclude Include="cShader.h" />

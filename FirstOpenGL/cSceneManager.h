@@ -11,23 +11,33 @@ class cGameObject;
 class cVAOMeshManager;
 class cMesh;
 class cEnemy;
+class cPlayer;
+class cPowerUp;
 
 struct sScene {
-	int id;
 	std::vector<cGameObject*> players;
 	std::vector<cGameObject*> enemies;
 	std::vector<cGameObject*> terrain;
+	std::vector<cGameObject*> powerUps;
 };
 
 class cSceneManager {
 public :
+	cSceneManager();
 	bool LoadSceneFromFileIntoSceneMap(std::string& fileName,int mapIndex);
 	bool LoadModelsFromModelInfoFile(std::string& filename, cVAOMeshManager* theMeshManager,int shaderId);
 
 	sScene getSceneById(int id);//copy the vector, we dont want to change the original
 	void copySceneFromCopyToPointer(const sScene& copyFrom, sScene* copyTo);
 	void populateEnemies(std::vector<cEnemy>& enemies,sScene* theScene);
+	void loadLevelTextures(sScene* theScene);
+	void loadNextLevel(sScene* g_pCurrentScene, cPlayer* thePlayer);
+	void configurePowerUpsForScene(sScene* theScene, std::vector<cPowerUp*>& thePowerUps);
+
 private:
+	int currentLevel;
+	int numLevels;
+
 	void loadObjectData(std::ifstream& theFile, std::vector<cGameObject*>& theVector);
 	void ReadFileToToken(std::ifstream &file, std::string token);
 	bool LoadPlyFileIntoMeshWith_Normals_and_UV(std::string filename, cMesh &theMesh);

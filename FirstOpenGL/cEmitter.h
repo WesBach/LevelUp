@@ -34,7 +34,6 @@ private:
 	glm::vec3 m_minRangeFromEmitter;
 	glm::vec3 m_maxRangeFromEmitter;
 	glm::vec3 m_acceleration;
-
 };
 
 #endif 
