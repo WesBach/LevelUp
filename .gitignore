@@ -11,6 +11,8 @@
 
 !FirstOpenGL/lib/[Dd]ebug/*
 !FirstOpenGL/lib/[Rr]elease/*
+[Dd]ebug
+[Rr]elease
 
 # Precompiled Headers
 *.gch
@@ -39,3 +41,4 @@
 .vs
 *.ipch
 *.enc
+*.idb
