@@ -5,7 +5,8 @@
 #include <glm\vec4.hpp>
 #include <glad\glad.h>
 #include <map>
-
+#include <sstream>
+#include <fstream>
 
 class cPhysTriangle;
 class sMeshDrawInfo;
@@ -43,5 +44,7 @@ namespace QnDTexureSamplerUtility
 	//	void setCubeSamplerAndBlenderByIndex( GLint samplerIndex, float blendRatio, GLint textureUnitID );
 	void SetSamplersForMeshTextures(cGameObject &object,std::map<std::string /*textureName*/, CTexUnitInfoBrief> &mapTexAndUnitInfo);
 };
+
+void ReadFileToToken(std::ifstream &file, std::string token);
 
 #endif

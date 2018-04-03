@@ -330,6 +330,8 @@ int main(int argc, char** argv)
 		float ratio;
 		int width, height;
 		g_cameraTarget_XYZ = g_pCurrentScene->players[0]->position;
+		//make the camera follow the player objects
+		g_cameraXYZ.x = g_pThePlayer->thePlayerObject->position.x;
 
 		glfwGetFramebufferSize(g_pGLFWWindow, &width, &height);
 		ratio = width / (float)height;
@@ -956,6 +958,7 @@ void restartOnPlayerDeath() {
 		g_pThePlayer->playerSpeed = 4.0f;
 		g_pThePlayer->rotationSpeed = 2.0f;
 		//populate the enemies
+		g_pSceneManager->setCurrentLevel(0);
 		g_pSceneManager->populateEnemies(g_vecEnemies, g_pCurrentScene);
 		g_pSceneManager->loadLevelTextures(g_pCurrentScene);
 
@@ -975,10 +978,11 @@ void restartOnPlayerDeath() {
 void loadNextLevel() {
 	if (g_pCurrentScene->enemies.size() == 0 && g_vecExplodedEnemies.size() == 0)
 	{
-		//go to next level
+		//go to next level (make sure everything is loaded for each. player,enemy,powerup)
 		g_pSceneManager->loadNextLevel(g_pCurrentScene,g_pThePlayer);
 		g_pSceneManager->loadLevelTextures(g_pCurrentScene);
 		g_pSceneManager->populateEnemies(g_vecEnemies,g_pCurrentScene);
+		g_pSceneManager->configurePowerUpsForScene(g_pCurrentScene, g_vecPowerUps);
 
 		//clear the particle system and rebuild for next level
 		g_pParticleManager->clearAllEmitters();

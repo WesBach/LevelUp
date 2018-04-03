@@ -102,7 +102,7 @@
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>assimp-vc140-mt.lib;pugixml.lib;freetyped.lib;PhysicsLibrary.lib;lua53.lib;glfw3.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>fmod_vc.lib;assimp-vc140-mt.lib;pugixml.lib;freetyped.lib;PhysicsLibrary.lib;lua53.lib;glfw3.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -134,7 +134,7 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>pugixml.lib;freetype.lib;assimp-vc140-mt.lib;PhysicsLibrary.lib;lua53.lib;glfw3.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>fmod_vc.lib;pugixml.lib;freetype.lib;assimp-vc140-mt.lib;PhysicsLibrary.lib;lua53.lib;glfw3.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -189,6 +189,7 @@
     <ClCompile Include="cSceneManager.cpp" />
     <ClCompile Include="cShader.cpp" />
     <ClCompile Include="cShaderManager.cpp" />
+    <ClCompile Include="cSoundManager.cpp" />
     <ClCompile Include="CStringHelper.cpp" />
     <ClCompile Include="CStringUtils.cpp" />
     <ClCompile Include="cTextRenderer.cpp" />
@@ -263,6 +264,7 @@
     <ClInclude Include="cShaderProgram.h" />
     <ClInclude Include="cShaderProgramInfo.h" />
     <ClInclude Include="cAngryState.h" />
+    <ClInclude Include="cSoundManager.h" />
     <ClInclude Include="CStringHelper.h" />
     <ClInclude Include="CStringUtils.h" />
     <ClInclude Include="cTextRenderer.h" />

@@ -1,0 +1,24 @@
+SOUND_TYPE_SELECTION
+uncompressed
+END_SOUND_TYPE_SELECTION
+
+	//For adding new sounds, paste the uncompressed or compressed sound in the corresponding section
+	//Add the sound to the assets folder of the project direcetory
+	//number of files must be changed as sounds are added or removed			
+
+				
+numberOfUncompressedFiles
+10
+//File Name							is3d		
+START_UNCOMPRESSED			
+video-game-7.wav					0					
+sky-loop.wav						0			
+rpg-town-loop-2.wav					0			
+ancient-0n-38mi.wav					0			
+footsteps-stones-a.wav				1		
+retro-game-heal-sound.wav			0		
+sword-fight.wav						1			
+door-church-close-e.wav				0		
+tavern-ambience-inside-laughter.wav	0	
+character-laughter.wav				1		
+END_UNCOMPRESSED	

@@ -6,7 +6,7 @@ NUMBER_OF_PLAYERS
 
 //meshname											pos.x		pos.y		pos.z		scale  vel.x	vel.y	vel.z   radius	Mass  diff.x	diff.y  diff.z diff.a    iswireframe	postRot.x	postRot.y	postRot.z  typeOfObject	hassAABB	hasTexture	stateType
 PLAYERS
-Utah_Teapot_xyz_n_uv.ply							20.0	 	0.0			00.0		5.0		0.0	 	0.0		0.0		 1.5	13.0	1.0		0.0		1.0		1.0			0			0.0			0.0			0.0			SPHERE		1		0		NONE
+Sample_Ship.ply									20.0	 	0.0			00.0		5.0		0.0	 	0.0		0.0		 1.5	13.0	1.0		0.0		1.0		1.0			0			0.0			0.0			0.0			SPHERE		1		0		NONE
 
 
 PLAYER_SPEED

@@ -10,10 +10,8 @@
 #include "cEnemy.h"
 #include "cPowerUp.h"
 #include "cEmitter.h"
-
+#include "Utilities.h"
 #include <iostream>
-#include <sstream>
-#include <fstream>
 
 extern glm::vec3 g_cameraXYZ;
 
@@ -266,20 +264,7 @@ void cSceneManager::loadObjectData(std::ifstream& theFile, std::vector<cGameObje
 	theVector.push_back(pTempGO);
 }
 
-void cSceneManager::ReadFileToToken(std::ifstream &file, std::string token)
-{
-	bool bKeepReading = true;
-	std::string garbage;
-	do
-	{
-		file >> garbage;		// Title_End??
-		if (garbage == token)
-		{
-			return;
-		}
-	} while (bKeepReading);
-	return;
-}
+
 
 bool cSceneManager::LoadPlyFileIntoMeshWith_Normals_and_UV(std::string filename, cMesh &theMesh)
 {
@@ -505,10 +490,6 @@ void cSceneManager::loadLevelTextures(sScene* theScene) {
 
 			for (int i = 0; i < theScene->players.size(); i++)
 			{
-				if (theScene->players[i]->meshName == "Utah_Teapot_xyz_n_uv.ply")
-				{
-					theScene->players[i]->vecMehs2DTextures.push_back(sTextureBindBlendInfo("lightning.bmp", 1.0f));
-				}
 				if (theScene->players[i]->meshName == "Sample_Ship.ply")
 				{
 					theScene->players[i]->vecMehs2DTextures.push_back(sTextureBindBlendInfo("sh3.bmp", 1.0f));
@@ -563,9 +544,9 @@ void cSceneManager::loadLevelTextures(sScene* theScene) {
 
 			for (int i = 0; i < theScene->players.size(); i++)
 			{
-				if (theScene->players[i]->meshName == "Utah_Teapot_xyz_n_uv.ply")
+				if (theScene->players[i]->meshName == "Sample_Ship.ply")
 				{
-					theScene->players[i]->vecMehs2DTextures.push_back(sTextureBindBlendInfo("TropicalSunnyDayBack2048.bmp", 0.5f));
+					theScene->players[i]->vecMehs2DTextures.push_back(sTextureBindBlendInfo("sh3.bmp", 1.0f));
 				}
 			}
 
@@ -617,9 +598,9 @@ void cSceneManager::loadLevelTextures(sScene* theScene) {
 
 			for (int i = 0; i < theScene->players.size(); i++)
 			{
-				if (theScene->players[i]->meshName == "Utah_Teapot_xyz_n_uv.ply")
+				if (theScene->players[i]->meshName == "Sample_Ship.ply")
 				{
-					theScene->players[i]->vecMehs2DTextures.push_back(sTextureBindBlendInfo("TropicalSunnyDayBack2048.bmp", 0.5f));
+					theScene->players[i]->vecMehs2DTextures.push_back(sTextureBindBlendInfo("sh3.bmp", 1.0f));
 				}
 			}
 
@@ -671,9 +652,9 @@ void cSceneManager::loadLevelTextures(sScene* theScene) {
 
 			for (int i = 0; i < theScene->players.size(); i++)
 			{
-				if (theScene->players[i]->meshName == "Utah_Teapot_xyz_n_uv.ply")
+				if (theScene->players[i]->meshName == "Sample_Ship.ply")
 				{
-					theScene->players[i]->vecMehs2DTextures.push_back(sTextureBindBlendInfo("TropicalSunnyDayBack2048.bmp", 0.5f));
+					theScene->players[i]->vecMehs2DTextures.push_back(sTextureBindBlendInfo("sh3.bmp", 1.0f));
 				}
 			}
 
@@ -733,4 +714,8 @@ void cSceneManager::configurePowerUpsForScene(sScene* theScene,std::vector<cPowe
 			thePowerups.push_back(new cPowerUp(eModifierType::MODIFIER_RANGE_INCREASE,ePickupType::PICKUP_RANGE_INCREASE, theScene->powerUps[i]));
 		}	
 	}
+}
+
+void cSceneManager::setCurrentLevel(int levelIndex) {
+	this->currentLevel = levelIndex;
 }

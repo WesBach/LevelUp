@@ -38,27 +38,21 @@ void Keyboard::key_resolution(int index) {
 	switch (index) {
 	case 65:
 		g_pThePlayer->movePlayer(right);
-		KeysPressed[65] = false;
 		break;
 	case 68:
 		g_pThePlayer->movePlayer(-right);
-		KeysPressed[68] = false;
 		break;
 	case 69:
 		g_pThePlayer->rotatePlayer(glm::vec3(0.0f, -1.0f, 0.0f));
-		KeysPressed[69] = false;
 		break;
 	case 81:
 		g_pThePlayer->rotatePlayer(glm::vec3(0.0f, 1.0f, 0.0f));
-		KeysPressed[81] = false;
 		break;
 	case 83:
 		g_pThePlayer->movePlayer(forward);
-		KeysPressed[83] = false;
 		break;
 	case 87:
 		g_pThePlayer->movePlayer(-forward);
-		KeysPressed[87] = false;
 		break;
 
 
@@ -98,7 +92,6 @@ void Keyboard::key_callback(GLFWwindow* window, int key, int scancode, int actio
 	if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
 		glfwSetWindowShouldClose(window, GLFW_TRUE);
 
-
 	if (key == GLFW_KEY_ENTER && action == GLFW_PRESS)
 	{
 		if (drawDebugInfo)
@@ -107,47 +100,78 @@ void Keyboard::key_callback(GLFWwindow* window, int key, int scancode, int actio
 			drawDebugInfo = true;
 	}
 
-
-	switch (key)
-	{
-
-	case GLFW_KEY_LEFT:		// Left
+	if (key == GLFW_KEY_LEFT) {
 		KeysPressed[263] = true;
-		break;
-	case GLFW_KEY_RIGHT:		// Right
-		KeysPressed[262] = true;
-		break;
-	case GLFW_KEY_RIGHT_SHIFT:		// Forward (along z)
-		KeysPressed[344] = true;
-		break;
-	case GLFW_KEY_KP_1:		// Backwards (along z)
-		KeysPressed[321] = true;
-		break;
-	case GLFW_KEY_UP:		// "Down" (along y axis)
-		KeysPressed[265] = true;
-		break;
-	case GLFW_KEY_DOWN:		// "Up" (along y axis)
-		KeysPressed[264] = true;
-		break;
+	}
 
-	case GLFW_KEY_A:		// Left
+	if (key == GLFW_KEY_RIGHT) {
+		KeysPressed[262] = true;
+	}
+
+	if (key == GLFW_KEY_RIGHT_SHIFT) {
+		KeysPressed[344] = true;
+	}
+
+	if (key == GLFW_KEY_KP_1) {
+		KeysPressed[321] = true;
+	}
+
+	if (key == GLFW_KEY_UP) {
+		KeysPressed[265] = true;
+	}
+
+	if (key == GLFW_KEY_DOWN) {
+		KeysPressed[264] = true;
+	}
+
+	if (key == GLFW_KEY_A && action == GLFW_PRESS) {
 		KeysPressed[65] = true;
-		break;
-	case GLFW_KEY_D:		// Right
+	}
+
+	if (key == GLFW_KEY_D && action == GLFW_PRESS) {
 		KeysPressed[68] = true;
-		break;
-	case GLFW_KEY_W:		// Forward (along z)
+	}
+
+	if (key == GLFW_KEY_W && action == GLFW_PRESS) {
 		KeysPressed[87] = true;
-		break;
-	case GLFW_KEY_S:		// Backwards (along z)
+	}
+
+	if (key == GLFW_KEY_S && action == GLFW_PRESS) {
 		KeysPressed[83] = true;
-		break;
-	case GLFW_KEY_Q:		// Forward (along z)
+	}
+
+	if (key == GLFW_KEY_Q && action == GLFW_PRESS) {
 		KeysPressed[81] = true;
-		break;
-	case GLFW_KEY_E:		// Backwards (along z)
+	}
+
+	if (key == GLFW_KEY_E && action == GLFW_PRESS) {
 		KeysPressed[69] = true;
-		break;
+	}
+
+
+	//release
+	if (key == GLFW_KEY_A && action == GLFW_RELEASE) {
+		KeysPressed[65] = false;
+	}
+
+	if (key == GLFW_KEY_D && action == GLFW_RELEASE) {
+		KeysPressed[68] = false;
+	}
+
+	if (key == GLFW_KEY_W && action == GLFW_RELEASE) {
+		KeysPressed[87] = false;
+	}
+
+	if (key == GLFW_KEY_S && action == GLFW_RELEASE) {
+		KeysPressed[83] = false;
+	}
+
+	if (key == GLFW_KEY_Q && action == GLFW_RELEASE) {
+		KeysPressed[81] = false;
+	}
+
+	if (key == GLFW_KEY_E && action == GLFW_RELEASE) {
+		KeysPressed[69] = false;
 	}
 
 	if (key == GLFW_KEY_SPACE && action == GLFW_PRESS) {

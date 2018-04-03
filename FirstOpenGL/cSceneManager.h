@@ -34,12 +34,12 @@ public :
 	void loadNextLevel(sScene* g_pCurrentScene, cPlayer* thePlayer);
 	void configurePowerUpsForScene(sScene* theScene, std::vector<cPowerUp*>& thePowerUps);
 
+	void setCurrentLevel(int levelIndex);
 private:
 	int currentLevel;
 	int numLevels;
 
 	void loadObjectData(std::ifstream& theFile, std::vector<cGameObject*>& theVector);
-	void ReadFileToToken(std::ifstream &file, std::string token);
 	bool LoadPlyFileIntoMeshWith_Normals_and_UV(std::string filename, cMesh &theMesh);
 	bool LoadPlyFileIntoMeshWithNormals(std::string filename, cMesh &theMesh);
 	std::map<int, sScene*> mSceneMap;

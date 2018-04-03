@@ -14,6 +14,7 @@
 #include "cFollowState.h"
 #include "cPlayer.h"
 #include "cSceneManager.h"
+#include "Utilities.h"
 
 #include <glm\vec3.hpp>
 #include <glm\glm.hpp>
@@ -38,20 +39,6 @@ extern cPlayer* g_pThePlayer;
 extern glm::vec3 maxDimensions;
 extern glm::vec3 minDimensions;
 
-void ReadFileToToken(std::ifstream &file, std::string token)
-{
-	bool bKeepReading = true;
-	std::string garbage;
-	do
-	{
-		file >> garbage;		// Title_End??
-		if (garbage == token)
-		{
-			return;
-		}
-	} while (bKeepReading);
-	return;
-}
 
 bool LoadLightsAttributesFromFile(std::string& fileName, std::vector<cLight>& theLights) {
 	//open the file

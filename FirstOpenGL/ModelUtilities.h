@@ -6,9 +6,6 @@
 #include "cMesh.h"
 class cVAOMeshManager;
 
-// Only "function signature"
-void ReadFileToToken( std::ifstream &file, std::string token );
-
 // Note the & symbol which is "by reference" which means
 //	it's NOT a copy, but referring to the original object.
 // ALSO note that this is a C++ thing (& isn't a thing in C)

@@ -2,6 +2,7 @@
 #include "PathingUtilities.h"
 #include "ModelUtilities.h"
 #include "cGameObject.h"
+#include "Utilities.h"
 
 cPathingManager::cPathingManager() {
 

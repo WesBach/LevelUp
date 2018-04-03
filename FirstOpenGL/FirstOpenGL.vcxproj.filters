@@ -290,6 +290,9 @@
     <ClCompile Include="cPowerUp.cpp">
       <Filter>Items</Filter>
     </ClCompile>
+    <ClCompile Include="cSoundManager.cpp">
+      <Filter>Managers</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="cShaderManager.h">
@@ -531,6 +534,9 @@
     </ClInclude>
     <ClInclude Include="cPowerUp.h">
       <Filter>Items</Filter>
+    </ClInclude>
+    <ClInclude Include="cSoundManager.h">
+      <Filter>Managers</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

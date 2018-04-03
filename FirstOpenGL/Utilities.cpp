@@ -3,8 +3,6 @@
 #include "cTriangle.h"
 #include "CTexUnitInfoBrief.h"
 #include <iPhysicsFactory.h>
-#include <sstream>
-#include <fstream>
 #include <iostream>
 #include <cstdlib>	// RAND_MAX
 #include <map>	
@@ -383,4 +381,19 @@ void InitPhysics() {
 	}
 
 	theFactory = CreateFactory();
+}
+
+void ReadFileToToken(std::ifstream &file, std::string token)
+{
+	bool bKeepReading = true;
+	std::string garbage;
+	do
+	{
+		file >> garbage;		// Title_End??
+		if (garbage == token)
+		{
+			return;
+		}
+	} while (bKeepReading);
+	return;
 }
