@@ -10,7 +10,7 @@ cPlayer::cPlayer() {
 	this->maxHealth = 100.0f;
 	this->currentHealth = 100.0f;
 	this->isInExplosionRadius = false;
-	this->projectileRange = 10.f;
+	this->projectileRange = 12.f;
 	this->timeInExplosion = 1.0f;
 	//for shooting
 	glm::vec3 forwardVector;
@@ -91,3 +91,11 @@ void  cPlayer::setProjectileRange() {
 		this->projectilePool[i].projectileRange = this->projectileRange;
 	}
 }
+
+void cPlayer::resetProjectiles() {
+	//reset the projectiles
+	for (int i = 0; i < this->projectilePool.size(); i++) {
+		this->projectilePool[i].inUse = false;
+	}
+}
+

@@ -44,6 +44,7 @@
 #include "cEnemy.h"
 #include "cParticleManager.h"
 #include "cPowerUp.h"
+#include "cSoundManager.h"
 
 bool loadTextures = false;
 int height = 480;	/* default */
@@ -62,6 +63,7 @@ void loadNextLevel();
 void handleExplosions(float deltaTime);
 void checkForPowerUpCollisions();
 void checkPlayerProjectileRanges();
+void checkPlayerHealth();
 
 std::string modelAndLightFile = "assets/GameInfoFiles/SceneInfo.txt";
 
@@ -72,6 +74,7 @@ cLightManager*		g_pLightManager;
 DebugRenderer*		g_pTheDebugrender;
 CTextureManager*	g_pTextureManager;
 cParticleManager*	g_pParticleManager;
+cSoundManager*		g_pSoundManager;
 std::vector<cEnemy> g_vecEnemies;
 std::vector<cEnemy> g_vecExplodedEnemies;
 std::vector<cPowerUp*> g_vecPowerUps;
@@ -300,6 +303,14 @@ int main(int argc, char** argv)
 	//load the textures for the scene
 	g_pSceneManager->loadLevelTextures(g_pCurrentScene);
 
+	//////////////////
+	//SOUND MANAGER//
+	/////////////////
+	g_pSoundManager = new cSoundManager();
+	g_pSoundManager->initSoundManager();
+	g_pSoundManager->readSoundsFromSoundFile("assets/GameInfoFiles/SoundInfo.txt");
+	g_pSoundManager->setInitialBackgroundSound();
+
 	glEnable(GL_DEPTH);
 	glCullFace(GL_BACK);
 	// Gets the "current" time "tick" or "step"
@@ -381,7 +392,6 @@ int main(int argc, char** argv)
 		checkObjectBounds();
 
 
-
 		//render the scene
 		renderScene(::g_pCurrentScene->terrain, g_pGLFWWindow);
 		renderScene(::g_pCurrentScene->enemies, g_pGLFWWindow);
@@ -399,18 +409,10 @@ int main(int argc, char** argv)
 			renderScene(::g_pThePlayer->projectilesToDraw, g_pGLFWWindow);
 		}
 
-
 		//draw explosions
 		for (int i = 0; i < g_vecExplodedEnemies.size(); i++) {
 			renderScene(::g_vecExplodedEnemies[i].explosion, g_pGLFWWindow);
 		}
-
-		//render the particles last so that transparency works properly
-		g_pParticleManager->updateEmitterPositions(g_vecEnemies, g_pThePlayer);
-		g_pParticleManager->drawActiveParticles(sexyShaderID);
-		//update particles 
-		g_pParticleManager->updateLivingParticles(deltaTime);
-
 
 		//Deal with the ai actions
 		for (int i = 0; i < g_pCurrentScene->enemies.size(); i++) {
@@ -466,7 +468,6 @@ int main(int argc, char** argv)
 			}
 		}//end ai actions
 
-
 		std::stringstream ssTitle;
 		ssTitle << "Camera (xyz): "
 			<< g_cameraXYZ.x << ", "
@@ -482,6 +483,12 @@ int main(int argc, char** argv)
 		checkForProjectileCollisions(deltaTime);
 		checkForPowerUpCollisions();
 
+		//render the particles last so that transparency works properly
+		g_pParticleManager->updateEmitterPositions(g_vecEnemies, g_pThePlayer);
+		g_pParticleManager->drawActiveParticles(sexyShaderID);
+		//update particles 
+		g_pParticleManager->updateLivingParticles(deltaTime);
+
 		//make sure the player projectiles don't go too far
 		checkPlayerProjectileRanges();
 		//deal with death
@@ -496,7 +503,7 @@ int main(int argc, char** argv)
 
 		//check to see if the enemies have died and move to next level
 		loadNextLevel();
-
+		checkPlayerHealth();
 		//switch back
 		g_lastTimeStep = curTime;
 		glfwSwapBuffers(g_pGLFWWindow);
@@ -532,10 +539,12 @@ void checkForPowerUpCollisions() {
 			ePickupType type = g_vecPowerUps[i]->getPowerUpType();
 			if (type == ePickupType::PICKUP_HEALTH) {
 				g_pThePlayer->currentHealth += g_vecPowerUps[i]->modifierValue;
+				g_pSoundManager->playHealthSound();
 			}
 			else if (type == ePickupType::PICKUP_RANGE_INCREASE) {
 				g_pThePlayer->projectileRange += g_vecPowerUps[i]->modifierValue;
 				g_pThePlayer->setProjectileRange();
+				g_pSoundManager->playRangeSound();
 			}
 			//set the power up to be removed
 			powerupsToRemove.push_back(true);
@@ -568,6 +577,9 @@ void checkForProjectileCollisions( float deltaTime) {
 			{
 				//objects are colliding do damage
 				g_vecEnemies[index].health -= g_pThePlayer->projectiles[i].damage;
+
+				//play the enemy impact sound
+				g_pSoundManager->playEnemyDamagedSound();
 
 				//check to see if the enemy is low health(will only add the emitter if it isn't already present)
 				if (g_vecEnemies[index].health < g_vecEnemies[index].maxHealth / 2.f)
@@ -610,6 +622,9 @@ void checkForProjectileCollisions( float deltaTime) {
 			if (glm::distance(g_vecEnemies[i].projectilesToDraw[projectilIndex]->position, g_pThePlayer->thePlayerObject->position) < g_pThePlayer->thePlayerObject->scale /2.f) {
 				//do damage to the player
 				g_pThePlayer->currentHealth -= g_vecEnemies[i].projectiles[projectilIndex].damage;
+
+				//play the player damaged sound
+				g_pSoundManager->playPlayerDamagedSound();
 
 				//set emitter to active
 				if (g_pThePlayer->currentHealth < g_pThePlayer->maxHealth / 2.f) {
@@ -679,7 +694,6 @@ void checkForProjectileCollisions( float deltaTime) {
 }
 
 void renderPlayerInfo(int winWidth, int winHeight) {
-
 	float sx = 2.0f / winWidth;
 	float sy = 2.0f / winHeight;
 	GLfloat yoffset = 50.0f;
@@ -690,20 +704,14 @@ void renderPlayerInfo(int winWidth, int winHeight) {
 	healthTitle += characterHealth;
 	g_ptheTextRenderer->render_text(healthTitle.c_str(), -1 + xoffset, 1 - yoffset * sy, sx, sy);
 	yoffset += 30.0f;
-
-	//character position
-	std::wstring posTitle = L"Position: X: ";
-	std::wstring characterPos = std::to_wstring(g_pThePlayer->thePlayerObject->position.x);
-	posTitle += characterPos + L" Y: ";
-	characterPos = std::to_wstring(g_pThePlayer->thePlayerObject->position.y);
-	posTitle += characterPos + L" Z: ";
-	characterPos = std::to_wstring(g_pThePlayer->thePlayerObject->position.z);
-	posTitle += characterPos;
-
-	healthTitle += characterHealth;
-	g_ptheTextRenderer->render_text(posTitle.c_str(), -1 + xoffset, 1 - yoffset * sy, sx, sy);
 }
 
+void checkPlayerHealth() {
+	//if the player picks up health the particles should disappear if above 1/2
+	if (g_pThePlayer->currentHealth >= g_pThePlayer->maxHealth / 2.f) {
+		g_pParticleManager->setPlayerEmitterToInactive();
+	}
+}
 //converts a string to a wide string
 //Return:	wstring
 std::wstring s2ws(std::string& s)
@@ -888,9 +896,9 @@ void createProjectiles() {
 		sProjectile tempProjectile;
 		tempProjectile.damage = 10.f;
 		tempProjectile.object = tempObject;
-		tempProjectile.speed = 2.f;
+		tempProjectile.speed = g_pThePlayer->playerSpeed + 2.f;
 		tempProjectile.inUse = false;
-		tempProjectile.projectileRange = 10.f;
+		tempProjectile.projectileRange = g_pThePlayer->projectileRange;
 		g_pThePlayer->projectilePool.push_back(tempProjectile);
 	}
 }
@@ -962,12 +970,15 @@ void restartOnPlayerDeath() {
 		g_pSceneManager->populateEnemies(g_vecEnemies, g_pCurrentScene);
 		g_pSceneManager->loadLevelTextures(g_pCurrentScene);
 
+		//reset the particles 
+		g_pThePlayer->resetProjectiles();
+		g_pSoundManager->changeBackGroundMusic("assets/Songs/Tapestry.wav");
 		//clear the emitters
 		g_pParticleManager->clearAllEmitters();
 		//add the emitters again
 		g_pParticleManager->createEmitters(g_vecEnemies.size());
 		g_pParticleManager->connectEmittersWithEntities(g_vecEnemies);
-
+		
 		//clear explosion vector
 		g_vecExplodedEnemies.clear();
 		//reload the projectiles into the player
@@ -978,8 +989,24 @@ void restartOnPlayerDeath() {
 void loadNextLevel() {
 	if (g_pCurrentScene->enemies.size() == 0 && g_vecExplodedEnemies.size() == 0)
 	{
+		//reset the particles 
+		g_pThePlayer->resetProjectiles();
+
 		//go to next level (make sure everything is loaded for each. player,enemy,powerup)
 		g_pSceneManager->loadNextLevel(g_pCurrentScene,g_pThePlayer);
+
+		//play the right level song
+		int levelNum = g_pSceneManager->getCurrentLevel();
+		if (levelNum == 1) {
+			g_pSoundManager->changeBackGroundMusic("assets/Songs/Failure.wav");
+		}
+		else if (levelNum == 2) {
+			g_pSoundManager->changeBackGroundMusic("assets/Songs/ThisIstheTime.wav");
+		}
+		if (levelNum == 3) {
+			g_pSoundManager->changeBackGroundMusic("assets/Songs/I'llBeOk.wav");
+		}
+
 		g_pSceneManager->loadLevelTextures(g_pCurrentScene);
 		g_pSceneManager->populateEnemies(g_vecEnemies,g_pCurrentScene);
 		g_pSceneManager->configurePowerUpsForScene(g_pCurrentScene, g_vecPowerUps);
@@ -1017,6 +1044,9 @@ void handleExplosions(float deltaTime) {
 			g_pParticleManager->deactivateEmitter(g_vecEnemies[i].particleManagerEmitterIndex);
 			g_vecEnemies.erase(g_vecEnemies.begin()+i);
 			g_pCurrentScene->enemies.erase(g_pCurrentScene->enemies.begin() + i);
+
+			//play the explosion sound
+			g_pSoundManager->playExplosionSound();
 		}
 	}
 

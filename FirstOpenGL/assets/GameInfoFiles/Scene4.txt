@@ -26,15 +26,15 @@ NUMBER_OF_ENEMIES
 
 //meshname											pos.x		pos.y		pos.z		scale  vel.x	vel.y	vel.z   radius	Mass  diff.x	diff.y  diff.z diff.a    iswireframe	postRot.x	postRot.y	postRot.z  typeOfObject	hassAABB	hasTexture	stateType
 ENEMIES	
-Viper_MkVII_ASCII_UVTex.ply							20.0	 	0.0			-15.0		5.0		0.0	 	0.0		0.0		 1.5	13.0	1.0		0.0		1.0		1.0			1			0.0			0.0			0.0			SPHERE		0				0		FOLLOWER
-Viper_MkVII_ASCII_UVTex.ply							25.0	 	0.0			10.0		5.0		0.0	 	0.0		0.0		 1.5	13.0	1.0		0.0		1.0		1.0			1			0.0			0.0			0.0			SPHERE		0				0		FOLLOWER
-mig29_xyz.ply										10.0	 	0.0			20.0		5.0		0.0	 	0.0		0.0		 1.5	13.0	1.0		0.0		1.0		1.0			1			0.0			0.0			0.0			SPHERE		0				0		ANGRY
-mig29_xyz.ply										-5.0	 	0.0			-10.0		5.0		0.0	 	0.0		0.0		 1.5	13.0	1.0		0.0		1.0		1.0			1			0.0			0.0			0.0			SPHERE		0				0		ANGRY
-Raider_ASCII_UVtex.ply								-15.0	 	0.0			-25.0		5.0		0.0	 	0.0		0.0		 1.5	13.0	1.0		0.0		1.0		1.0			1			0.0			0.0			0.0			SPHERE		0				0		CURIOUS
-Raider_ASCII_UVtex.ply								-5.0 		0.0			5.0			5.0		0.0	 	0.0		0.0		 1.5	13.0	1.0		0.0		1.0		1.0			1			0.0			0.0			0.0			SPHERE		0				0		CURIOUS
-Raider_ASCII_UVtex.ply								-30.0 		0.0			25.0		5.0		0.0	 	0.0		0.0		 1.5	13.0	1.0		0.0		1.0		1.0			1			0.0			0.0			0.0			SPHERE		0				0		CURIOUS
-mig29_xyz.ply										30.0	 	0.0			-25.0		5.0		0.0	 	0.0		0.0		 1.5	13.0	1.0		0.0		1.0		1.0			1			0.0			0.0			0.0			SPHERE		0				0		ANGRY
-Viper_MkVII_ASCII_UVTex.ply							30.0	 	0.0			30.0		5.0		0.0	 	0.0		0.0		 1.5	13.0	1.0		0.0		1.0		1.0			1			0.0			0.0			0.0			SPHERE		0				0		FOLLOWER
+Viper_MkVII_ASCII_UVTex.ply							20.0	 	0.0			-15.0		5.0		0.0	 	0.0		0.0		 1.5	13.0	1.0		0.0		1.0		1.0			0			0.0			0.0			0.0			SPHERE		0				0		FOLLOWER
+Viper_MkVII_ASCII_UVTex.ply							25.0	 	0.0			10.0		5.0		0.0	 	0.0		0.0		 1.5	13.0	1.0		0.0		1.0		1.0			0			0.0			0.0			0.0			SPHERE		0				0		FOLLOWER
+mig29_xyz.ply										10.0	 	0.0			20.0		5.0		0.0	 	0.0		0.0		 1.5	13.0	1.0		0.0		1.0		1.0			0			0.0			0.0			0.0			SPHERE		0				0		ANGRY
+mig29_xyz.ply										-5.0	 	0.0			-10.0		5.0		0.0	 	0.0		0.0		 1.5	13.0	1.0		0.0		1.0		1.0			0			0.0			0.0			0.0			SPHERE		0				0		ANGRY
+Raider_ASCII_UVtex.ply								-15.0	 	0.0			-25.0		5.0		0.0	 	0.0		0.0		 1.5	13.0	1.0		0.0		1.0		1.0			0			0.0			0.0			0.0			SPHERE		0				0		CURIOUS
+Raider_ASCII_UVtex.ply								-5.0 		0.0			5.0			5.0		0.0	 	0.0		0.0		 1.5	13.0	1.0		0.0		1.0		1.0			0			0.0			0.0			0.0			SPHERE		0				0		CURIOUS
+Raider_ASCII_UVtex.ply								-30.0 		0.0			25.0		5.0		0.0	 	0.0		0.0		 1.5	13.0	1.0		0.0		1.0		1.0			0			0.0			0.0			0.0			SPHERE		0				0		CURIOUS
+mig29_xyz.ply										30.0	 	0.0			-25.0		5.0		0.0	 	0.0		0.0		 1.5	13.0	1.0		0.0		1.0		1.0			0			0.0			0.0			0.0			SPHERE		0				0		ANGRY
+Viper_MkVII_ASCII_UVTex.ply							30.0	 	0.0			30.0		5.0		0.0	 	0.0		0.0		 1.5	13.0	1.0		0.0		1.0		1.0			0			0.0			0.0			0.0			SPHERE		0				0		FOLLOWER
 
 ENEMY_SPEED
 1.0

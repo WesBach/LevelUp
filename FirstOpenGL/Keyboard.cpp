@@ -7,12 +7,14 @@
 #include "LuaBrain.h"
 #include "cPlayer.h"
 #include "cSceneManager.h"
+#include "cSoundManager.h"
 
 extern glm::vec3 g_cameraXYZ;
 extern glm::vec3 g_cameraTarget_XYZ;
 
 extern sScene* g_pCurrentScene;
 extern cGameObject* g_curGameObject;
+extern cSoundManager* g_pSoundManager;
 
 extern cPlayer* g_pThePlayer;
 extern cLightManager*		g_pLightManager;
@@ -188,6 +190,9 @@ void Keyboard::key_callback(GLFWwindow* window, int key, int scancode, int actio
 			g_pThePlayer->projectilesToDraw.push_back(projectile.object);
 			//add the projectile to projectiles for keeping track of movement
 			g_pThePlayer->projectiles.push_back(projectile);
+
+			//make the shoot noise
+			g_pSoundManager->playPlayerShootSound();
 		}
 	}
 	

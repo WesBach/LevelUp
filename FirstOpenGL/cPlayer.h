@@ -26,6 +26,7 @@ public:
 	void removeProjectile(cGameObject* theProjectile);
 	void setProjectileInUse(sProjectile& projectile);
 	void setProjectileRange();
+	void resetProjectiles();
 
 	int getNextProjectileIndex();
 	//for shooting

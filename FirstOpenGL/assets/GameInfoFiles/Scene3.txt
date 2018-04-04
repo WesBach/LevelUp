@@ -26,12 +26,12 @@ NUMBER_OF_ENEMIES
 
 //meshname											pos.x		pos.y		pos.z		scale  vel.x	vel.y	vel.z   radius	Mass  diff.x	diff.y  diff.z diff.a    iswireframe	postRot.x	postRot.y	postRot.z  typeOfObject	hassAABB	hasTexture	stateType
 ENEMIES	
-Viper_MkVII_ASCII_UVTex.ply							10.0	 	0.0			-10.0		5.0		0.0	 	0.0		0.0		 1.5	13.0	1.0		0.0		1.0		1.0			1			0.0			0.0			0.0			SPHERE		0				0		FOLLOWER
-Viper_MkVII_ASCII_UVTex.ply							15.0	 	0.0			10.0		5.0		0.0	 	0.0		0.0		 1.5	13.0	1.0		0.0		1.0		1.0			1			0.0			0.0			0.0			SPHERE		0				0		FOLLOWER
-mig29_xyz.ply										0.0	 		0.0			20.0		5.0		0.0	 	0.0		0.0		 1.5	13.0	1.0		0.0		1.0		1.0			1			0.0			0.0			0.0			SPHERE		0				0		ANGRY
-mig29_xyz.ply										-20.0	 	0.0			-10.0		5.0		0.0	 	0.0		0.0		 1.5	13.0	1.0		0.0		1.0		1.0			1			0.0			0.0			0.0			SPHERE		0				0		ANGRY
-Raider_ASCII_UVtex.ply								-10.0	 	0.0			-20.0		5.0		0.0	 	0.0		0.0		 1.5	13.0	1.0		0.0		1.0		1.0			1			0.0			0.0			0.0			SPHERE		0				0		CURIOUS
-Raider_ASCII_UVtex.ply								-5.0 		0.0			5.0			5.0		0.0	 	0.0		0.0		 1.5	13.0	1.0		0.0		1.0		1.0			1			0.0			0.0			0.0			SPHERE		0				0		CURIOUS
+Viper_MkVII_ASCII_UVTex.ply							10.0	 	0.0			-10.0		5.0		0.0	 	0.0		0.0		 1.5	13.0	1.0		0.0		1.0		1.0			0			0.0			0.0			0.0			SPHERE		0				0		FOLLOWER
+Viper_MkVII_ASCII_UVTex.ply							15.0	 	0.0			10.0		5.0		0.0	 	0.0		0.0		 1.5	13.0	1.0		0.0		1.0		1.0			0			0.0			0.0			0.0			SPHERE		0				0		FOLLOWER
+mig29_xyz.ply										0.0	 		0.0			20.0		5.0		0.0	 	0.0		0.0		 1.5	13.0	1.0		0.0		1.0		1.0			0			0.0			0.0			0.0			SPHERE		0				0		ANGRY
+mig29_xyz.ply										-20.0	 	0.0			-10.0		5.0		0.0	 	0.0		0.0		 1.5	13.0	1.0		0.0		1.0		1.0			0			0.0			0.0			0.0			SPHERE		0				0		ANGRY
+Raider_ASCII_UVtex.ply								-10.0	 	0.0			-20.0		5.0		0.0	 	0.0		0.0		 1.5	13.0	1.0		0.0		1.0		1.0			0			0.0			0.0			0.0			SPHERE		0				0		CURIOUS
+Raider_ASCII_UVtex.ply								-5.0 		0.0			5.0			5.0		0.0	 	0.0		0.0		 1.5	13.0	1.0		0.0		1.0		1.0			0			0.0			0.0			0.0			SPHERE		0				0		CURIOUS
 
 
 ENEMY_SPEED
@@ -41,8 +41,8 @@ NUMBER_OF_POWERUPS
 4
 
 POWERUPS
-health_pack.ply										-30.0	 	0.0			30.0		2.0		0.0	 	0.0		0.0		 1.5	13.0	1.0		0.0		1.0		1.0			1			0.0			00.0			0.0			SPHERE		0			0		FOLLOWER
-bullet.ply											-30.0	 	0.0			-30.0		2.0		0.0	 	0.0		0.0		 1.5	13.0	1.0		0.0		1.0		1.0			1			0.0			00.0			0.0			SPHERE		0			0		FOLLOWER
-health_pack.ply										30.0	 	0.0			30.0		2.0		0.0	 	0.0		0.0		 1.5	13.0	1.0		0.0		1.0		1.0			1			0.0			00.0			0.0			SPHERE		0			0		FOLLOWER
-bullet.ply											30.0	 	0.0			-30.0		2.0		0.0	 	0.0		0.0		 1.5	13.0	1.0		0.0		1.0		1.0			1			0.0			00.0			0.0			SPHERE		0			0		FOLLOWER
+health_pack.ply										-30.0	 	0.0			30.0		2.0		0.0	 	0.0		0.0		 1.5	13.0	1.0		0.0		1.0		1.0			0			0.0			00.0			0.0			SPHERE		0			0		FOLLOWER
+bullet.ply											-30.0	 	0.0			-30.0		2.0		0.0	 	0.0		0.0		 1.5	13.0	1.0		0.0		1.0		1.0			0			0.0			00.0			0.0			SPHERE		0			0		FOLLOWER
+health_pack.ply										30.0	 	0.0			30.0		2.0		0.0	 	0.0		0.0		 1.5	13.0	1.0		0.0		1.0		1.0			0			0.0			00.0			0.0			SPHERE		0			0		FOLLOWER
+bullet.ply											30.0	 	0.0			-30.0		2.0		0.0	 	0.0		0.0		 1.5	13.0	1.0		0.0		1.0		1.0			0			0.0			00.0			0.0			SPHERE		0			0		FOLLOWER
 

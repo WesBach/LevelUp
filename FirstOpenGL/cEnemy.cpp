@@ -99,7 +99,7 @@ cEnemy::cEnemy() {
 
 		sProjectile pro;
 		pro.object = projectileObject;
-		pro.speed = 2.f;
+		pro.speed = 12.f;
 		pro.inUse = false;
 		this->projectilePool.push_back(pro);
 	}

@@ -116,7 +116,7 @@ void cParticleManager::setPlayerEmitterToInactive(){
 	//the emitter is active so remove it
 	if (isInactive == false) {
 		//remove the emitter
-		for (std::vector<cEmitter*>::iterator it = this->mEnemyEmitters.begin(); it != this->mEnemyEmitters.end(); it++) {
+		for (std::vector<cEmitter*>::iterator it = this->mActiveEmitters.begin(); it != this->mActiveEmitters.end(); it++) {
 			if (*it == this->mPlayerEmitter) {
 				it = this->mActiveEmitters.erase(it);
 				break;
@@ -162,7 +162,6 @@ void cParticleManager::updateLivingParticles(float deltaTime) {
 		this->mActiveEmitters[i]->Update(deltaTime);
 	}
 }
-
 
 void cParticleManager::drawActiveParticles(int shaderId) {
 
@@ -217,11 +216,9 @@ void cParticleManager::updateEmitterPositions(std::vector<cEnemy>& enemies, cPla
 	//update the emitter position for the player
 	this->mPlayerEmitter->position= thePlayer->thePlayerObject->position;
 	//update the emitter position for the enemies
-	if (enemies.size() <= this->mEnemyEmitters.size())
-	{
+	if (enemies.size() <= this->mEnemyEmitters.size()) {
 		for (int i = 0; i < enemies.size(); i++) {
-			this->mEnemyEmitters[i]->position = enemies[i].theEnemyObject->position;
+			this->mEnemyEmitters[enemies[i].particleManagerEmitterIndex]->position = enemies[i].theEnemyObject->position;
 		}
 	}
-
 }

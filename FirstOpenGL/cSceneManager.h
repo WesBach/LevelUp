@@ -34,6 +34,7 @@ public :
 	void loadNextLevel(sScene* g_pCurrentScene, cPlayer* thePlayer);
 	void configurePowerUpsForScene(sScene* theScene, std::vector<cPowerUp*>& thePowerUps);
 
+	int getCurrentLevel();
 	void setCurrentLevel(int levelIndex);
 private:
 	int currentLevel;

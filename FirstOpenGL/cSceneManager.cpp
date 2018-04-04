@@ -675,6 +675,10 @@ void cSceneManager::loadLevelTextures(sScene* theScene) {
 	}
 }
 
+int cSceneManager::getCurrentLevel() {
+	return this->currentLevel;
+}
+
 void cSceneManager::loadNextLevel(sScene* g_pCurrentScene,cPlayer* thePlayer) {
 
 	if (this->currentLevel == this->numLevels) {

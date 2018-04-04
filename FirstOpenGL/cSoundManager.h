@@ -16,9 +16,15 @@ class cSoundManager {
 public:
 	void playEnemyDamagedSound();
 	void playPlayerDamagedSound();
+	void playPlayerShootSound();
+	void playEnemyShootSound();
 	void changeBackGroundMusic(std::string levelName);
 	void playExplosionSound();
+	void playHealthSound();
+	void playRangeSound();
+
 	void initSoundManager();
+	void setInitialBackgroundSound();
 
 	void readSoundsFromSoundFile(std::string filename);
 
@@ -26,8 +32,9 @@ public:
 private:
 	void checkForFMODError(FMOD_RESULT result);
 	//Global variables
-	FMOD_RESULT g_result;
-	FMOD::System *g_system = nullptr;
+	FMOD_RESULT mResult;
+	FMOD::System *mSystem = nullptr;
+	SoundHelper* mBackgroundMusicSound;
 	FMOD::ChannelGroup *group_actionSounds, *group_backgroundSongs, *group_master;
 };
 
