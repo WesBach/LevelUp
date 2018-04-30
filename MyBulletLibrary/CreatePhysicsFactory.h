@@ -1,6 +1,7 @@
 #pragma once
-#include "cPhysicsFactory.h"
-#include "cPhysicsWorld.h"
+#include <iPhysicsFactory.h>
+
+//external function used to access the dll
 
 #define EXTERN_DLL_EXPORT extern "C" __declspec(dllexport)
 

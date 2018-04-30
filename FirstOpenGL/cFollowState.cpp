@@ -151,7 +151,7 @@ void cFollowState::performAction(cGameObject* player, cGameObject* me, float del
 			}
 			direction.y = 0.0f;
 			//make the enemy move towards the player at a set speed 
-			me->position += direction * this->speed * deltaTime;			
+			me->position += direction * 5.f * deltaTime;			
 		}
 
 		//set the players orientation

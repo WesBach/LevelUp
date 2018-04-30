@@ -873,6 +873,7 @@ void checkPlayerProjectileRanges() {
 	//remove the projectiles
 	for (int i = 0; i < projectilesToRemove.size(); i++) {
 		if (projectilesToRemove[i] == true) {
+			g_pThePlayer->projectiles[i].inUse = false;
 			g_pThePlayer->projectiles.erase(g_pThePlayer->projectiles.begin() + i);
 			g_pThePlayer->projectilesToDraw.erase(g_pThePlayer->projectilesToDraw.begin() + i);
 		}
@@ -969,7 +970,7 @@ void restartOnPlayerDeath() {
 		g_pSceneManager->setCurrentLevel(0);
 		g_pSceneManager->populateEnemies(g_vecEnemies, g_pCurrentScene);
 		g_pSceneManager->loadLevelTextures(g_pCurrentScene);
-
+		g_pSceneManager->configurePowerUpsForScene(g_pCurrentScene,g_vecPowerUps);
 		//reset the particles 
 		g_pThePlayer->resetProjectiles();
 		g_pSoundManager->changeBackGroundMusic("assets/Songs/Tapestry.wav");

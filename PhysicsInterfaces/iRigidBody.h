@@ -12,6 +12,7 @@ namespace nPhysics
 
 		virtual iShape* GetShape() = 0;
 
+		//accessors
 		virtual void GetTransform(glm::mat4& transformOut) = 0;
 		virtual void GetPosition(glm::vec3& positionOut) = 0;
 		virtual void GetRotation(glm::vec3& rotationOut) = 0;
@@ -22,6 +23,7 @@ namespace nPhysics
 		virtual void GetInverseMass(glm::vec3& velOut) = 0;
 		virtual void GetMass(float& massOut) = 0;
 
+		//mutators
 		virtual void SetTransform(glm::mat4& transformIn) = 0;
 		virtual void SetPosition(glm::vec3& positionIn) = 0;
 		virtual void SetRotation(glm::vec3& rotationIn) = 0;
@@ -32,6 +34,7 @@ namespace nPhysics
 		virtual void SetInverseMass(glm::vec3& velIn) = 0;
 		virtual void SetMass(float& massIn) = 0;
 
+		//impulse applications
 		virtual void ApplyImpulseAtPoint(const glm::vec3& impulse, const glm::vec3& relativePoint) = 0;
 		virtual void applyTorque(const glm::vec3& torque) = 0;
 		virtual void GetVelocityAtPoint(glm::vec3& relativePoint, glm::vec3& velocityOut) = 0;

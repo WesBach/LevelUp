@@ -11,9 +11,13 @@ namespace nPhysics
 		
 		eShapeType GetShapeType() { return mShapeType; }
 
+		//accessors for specific shapes
 		virtual bool GetSphereRadius(float& radiusOut) { return false; }
 		virtual bool GetPlaneNormal(glm::vec3& normalOut) { return false; }
 		virtual bool GetPlaneConst(float& planeConstOut) { return false; }
+		virtual bool GetCylinderHalfExtents(glm::vec3& halfExtents) { return false; }
+		virtual bool GetBoxHalfExtents(glm::vec3& halfExtents) { return false; }
+		virtual bool GetConeRadiusAndHeight(float& radius, float& height) { return false; }
 
 	protected:
 		iShape(eShapeType shapeType)

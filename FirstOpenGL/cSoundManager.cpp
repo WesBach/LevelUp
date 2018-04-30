@@ -73,11 +73,13 @@ void  cSoundManager::changeBackGroundMusic(std::string levelName) {
 	//set the new background sound
 	this->mBackgroundMusicSound = &mSounds[levelName];
 	this->mBackgroundMusicSound->theChannel->setPaused(false);
+	this->mBackgroundMusicSound->theChannel->setVolume(float(0.8f));
 }
 
 void cSoundManager::setInitialBackgroundSound() {
 	this->mBackgroundMusicSound = &mSounds["assets/Songs/Tapestry.wav"];
 	this->mBackgroundMusicSound->theChannel->setPaused(false);
+	this->mBackgroundMusicSound->theChannel->setVolume(float(0.8f));
 }
 
 void cSoundManager::readSoundsFromSoundFile(std::string filename) {

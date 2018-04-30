@@ -1,0 +1,17 @@
+Physics Final Project Proposal
+
+Red Circle:
+	- player will have a motorized "shield" made up of 2 - 3 hinged spheres
+
+Blue Cirlce:
+	- player projectiles will be rigid bodies with custom response for damage
+	
+Not Shown in Picture:
+	- an animated "object", most likely a mech but if i can't find one that will work it will
+		be an animated person with rigid bodies on the limbs and torso for collision response
+	
+	- a slider with a motor as an obstacle that does damage 
+	
+	- if i get enough time i will try to make a different kid of projectile that will have two rigid bodies constrained to eachother,
+		most likely 6 degrees of freedom
+	
